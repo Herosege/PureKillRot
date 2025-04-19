@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://dieygibdnb71p"]
+
+[ext_resource type="Script" uid="uid://rsmrex1t1um1" path="res://Script/dialogue_area.gd" id="1_vsdmm"]
+
+[node name="DialogueArea" type="Area2D"]
+process_priority = 1
+script = ExtResource("1_vsdmm")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

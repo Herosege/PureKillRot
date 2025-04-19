@@ -1,0 +1,40 @@
+[gd_scene load_steps=3 format=3 uid="uid://cvkkv0325tbmi"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_ay6sd"]
+font_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wfj4x"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 2
+border_width_right = 2
+border_color = Color(0.8, 0, 0, 1)
+
+[node name="Item" type="Control"]
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 190.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="."]
+z_index = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Simple attack"
+label_settings = SubResource("LabelSettings_ay6sd")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="Label"]
+z_index = -1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_wfj4x")

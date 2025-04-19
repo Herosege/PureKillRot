@@ -1,0 +1,82 @@
+[gd_scene load_steps=7 format=3 uid="uid://b461j4ney5bsb"]
+
+[ext_resource type="Script" uid="uid://b73s70xssf4a6" path="res://Script/UIElements/char_profile.gd" id="1_44v3o"]
+[ext_resource type="Texture2D" uid="uid://bls8cn6je3t52" path="res://Assets/Icons/Othenson.png" id="1_deygv"]
+[ext_resource type="Shader" uid="uid://bxaygjvv1hcr1" path="res://Resources/Shaders/char_profile_border.gdshader" id="2_alxar"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hovjx"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 0.52549)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5yglc"]
+shader = ExtResource("2_alxar")
+shader_parameter/line_color = Color(1, 1, 1, 1)
+shader_parameter/line_thickness = 1.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_8kfvr"]
+font_size = 18
+
+[node name="CharProfile" type="Control"]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 3
+anchor_right = 0.208
+anchor_bottom = 0.139
+offset_right = 0.319992
+offset_bottom = -0.0800095
+script = ExtResource("1_44v3o")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hovjx")
+
+[node name="CurSelected" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.196078)
+
+[node name="StatsPicture" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/separation = 10
+
+[node name="TextureRect" type="TextureRect" parent="StatsPicture"]
+material = SubResource("ShaderMaterial_5yglc")
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("1_deygv")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="StatsPicture"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="StatsPicture/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Othenson"
+label_settings = SubResource("LabelSettings_8kfvr")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label" type="Label" parent="StatsPicture/VBoxContainer"]
+layout_mode = 2
+text = "100"
+
+[node name="Label2" type="Label" parent="StatsPicture/VBoxContainer"]
+layout_mode = 2
+text = "100"

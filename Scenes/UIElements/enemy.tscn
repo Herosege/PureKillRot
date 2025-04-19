@@ -1,0 +1,44 @@
+[gd_scene load_steps=7 format=3 uid="uid://nc7u0wtwxqmo"]
+
+[ext_resource type="Shader" uid="uid://dy0oe7rxlvpmv" path="res://Resources/Shaders/EnemyBattleShader.gdshader" id="1_320pc"]
+[ext_resource type="Texture2D" uid="uid://cw0k254lt0fy7" path="res://Assets/Sprites/Enemy/Enemy1.png" id="2_wxsom"]
+[ext_resource type="Texture2D" uid="uid://bectm3npxo3o1" path="res://Assets/Sprites/Enemy/Enemy2.png" id="3_nxrf4"]
+[ext_resource type="Texture2D" uid="uid://blus7aljrc03j" path="res://Assets/Sprites/Enemy/Enemy3.png" id="4_byiwl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8xthn"]
+shader = ExtResource("1_320pc")
+shader_parameter/FlashOn = false
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_7hqdl"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_wxsom")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_nxrf4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_byiwl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_nxrf4")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Enemy" type="Control"]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 3
+anchors_preset = 0
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_8xthn")
+scale = Vector2(1.5, 1.5)
+sprite_frames = SubResource("SpriteFrames_7hqdl")
+autoplay = "default"
+centered = false

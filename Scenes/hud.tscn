@@ -1,0 +1,117 @@
+[gd_scene load_steps=8 format=3 uid="uid://dn4kjdwdkwodj"]
+
+[ext_resource type="Script" uid="uid://5836uo1aw6vf" path="res://Script/hud.gd" id="1_bo7pw"]
+[ext_resource type="PackedScene" uid="uid://d0w50wqi3fr08" path="res://Scenes/dialogue_box.tscn" id="1_jh87u"]
+[ext_resource type="PackedScene" uid="uid://e55yhkovq1g7" path="res://Scenes/menu.tscn" id="3_1tenn"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_bjfho"]
+font_size = 48
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Animation" id="Animation_bjfho"]
+resource_name = "NewAnn"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Announcement:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Announcement/Label:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.55, 2.5, 3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_6fbih"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Announcement:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Announcement/Label:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_6fbih"]
+_data = {
+&"NewAnn": SubResource("Animation_bjfho"),
+&"RESET": SubResource("Animation_6fbih")
+}
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_bo7pw")
+
+[node name="DialogueBox" parent="." instance=ExtResource("1_jh87u")]
+visible = false
+
+[node name="Menu" parent="." instance=ExtResource("3_1tenn")]
+visible = false
+mouse_filter = 2
+
+[node name="Announcement" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -578.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Announcement"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "A nice forest"
+label_settings = SubResource("LabelSettings_bjfho")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnnouncementAnim" type="AnimationPlayer" parent="Announcement"]
+root_node = NodePath("../..")
+libraries = {
+&"": SubResource("AnimationLibrary_6fbih")
+}

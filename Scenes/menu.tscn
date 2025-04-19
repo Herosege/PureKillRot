@@ -1,0 +1,160 @@
+[gd_scene load_steps=5 format=3 uid="uid://e55yhkovq1g7"]
+
+[ext_resource type="Script" uid="uid://dykt2u38tm08n" path="res://Script/menu.gd" id="1_qd5w8"]
+[ext_resource type="Texture2D" uid="uid://bls8cn6je3t52" path="res://Assets/Icons/Othenson.png" id="1_unlas"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alioa"]
+bg_color = Color(0, 0, 0, 0.470588)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="LabelSettings" id="LabelSettings_vtf3y"]
+font_size = 10
+
+[node name="Menu" type="Control"]
+process_mode = 3
+z_index = 10
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qd5w8")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.470588)
+metadata/_edit_lock_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Select" type="MarginContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/margin_right = 800
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Select"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="MarginContainer/Select/VBoxContainer"]
+layout_mode = 2
+text = "Items"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="MarginContainer/Select/VBoxContainer"]
+layout_mode = 2
+text = "Party"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label3" type="Label" parent="MarginContainer/Select/VBoxContainer"]
+layout_mode = 2
+text = "Map
+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 200
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="CharacterSlot" type="Panel" parent="MarginContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 100)
+layout_direction = 2
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_alioa")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="CharacterInfo" type="HBoxContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="CharIcon" type="TextureRect" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("1_unlas")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Name" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo"]
+layout_mode = 2
+text = "Othenson
+"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo"]
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer"]
+layout_mode = 2
+text = "Health : "
+label_settings = SubResource("LabelSettings_vtf3y")
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Label2" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Physical - 100/100"
+
+[node name="Label3" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Mental - 100/100"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo"]
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer2"]
+layout_mode = 2
+text = "Status effects : "
+label_settings = SubResource("LabelSettings_vtf3y")
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer2"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Label2" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer2/VBoxContainer"]
+layout_mode = 2
+text = "Physical - "
+
+[node name="Label3" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer2/VBoxContainer"]
+layout_mode = 2
+text = "Mental - "

@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3 uid="uid://n7fwdscbrrnq"]
+
+[ext_resource type="Script" uid="uid://dd02fg18e1hpv" path="res://Script/player.gd" id="1_7uqau"]
+[ext_resource type="Texture2D" uid="uid://c2kvgv6kr1yxh" path="res://Assets/Sprites/me1.png" id="2_cvnsp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2k4lj"]
+size = Vector2(32, 24)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_okuqu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_cvnsp")
+}],
+"loop": true,
+"name": &"default",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_cvnsp")
+}],
+"loop": true,
+"name": &"default_walk",
+"speed": 5.0
+}]
+
+[node name="Player" type="CharacterBody2D" groups=["player"]]
+z_index = 1
+y_sort_enabled = true
+script = ExtResource("1_7uqau")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 3)
+shape = SubResource("RectangleShape2D_2k4lj")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(4, 16)
+sprite_frames = SubResource("SpriteFrames_okuqu")
+offset = Vector2(0, -32)
+metadata/_edit_lock_ = true

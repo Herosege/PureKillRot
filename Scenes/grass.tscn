@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://cm3h1sk6qvxgh"]
+
+[ext_resource type="Script" uid="uid://be7qvd0tysrw" path="res://Script/grass.gd" id="1_jqrih"]
+[ext_resource type="Texture2D" uid="uid://cm4rcwtwafbte" path="res://Assets/Tilemaps/Grass/tilemapgrass_frames_2.png" id="2_sc61j"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gvo0g"]
+size = Vector2(32, 8)
+
+[node name="Grass" type="Node2D"]
+z_index = 1
+y_sort_enabled = true
+script = ExtResource("1_jqrih")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+y_sort_enabled = true
+texture = ExtResource("2_sc61j")
+offset = Vector2(0, -32)
+hframes = 2
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(0, 2)
+shape = SubResource("RectangleShape2D_gvo0g")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]

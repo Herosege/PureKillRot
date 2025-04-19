@@ -1,0 +1,40 @@
+[gd_scene load_steps=4 format=3 uid="uid://bp77o3susnype"]
+
+[ext_resource type="Script" uid="uid://fqtxy3rc051f" path="res://Script/UIElements/cursor.gd" id="1_vinkb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1niu8"]
+bg_color = Color(1, 1, 1, 0.156863)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7meam"]
+draw_center = false
+border_width_left = 6
+border_width_right = 6
+border_color = Color(1, 1, 1, 1)
+
+[node name="Cursor" type="Control" groups=["Cursor"]]
+z_index = 1
+layout_mode = 3
+anchor_right = 0.062
+anchor_bottom = 0.083
+offset_right = 0.32
+offset_bottom = 0.159996
+script = ExtResource("1_vinkb")
+
+[node name="Panel" type="Panel" parent="."]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1niu8")
+
+[node name="CursorSel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7meam")

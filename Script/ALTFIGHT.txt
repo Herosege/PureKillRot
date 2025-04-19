@@ -1,0 +1,199 @@
+extends Control
+
+const NUM_COLUMNS_ITEMS = 4
+const ITEMS_PER_PAGE = 8
+
+@onready var ActionContainer = get_tree().get_first_node_in_group("ActionContainer")
+@onready var Cursor = get_tree().get_nodes_in_group("Cursor")
+@onready var ListItems = get_tree().get_first_node_in_group("ItemList")
+@onready var MIArrow = get_tree().get_first_node_in_group("MoreItemsArrow")
+@onready var PIArrow = get_tree().get_first_node_in_group("PrevItemsArrow")
+@onready var EnemyList = get_tree().get_first_node_in_group("EnemyList")
+
+@onready var ItemScene = load("res://Scenes/UIElements/item.tscn") 
+
+#Action -> Select Item -> EnemySelect
+var MenuLayer : int = 0 
+var UiDir : Vector2 = Vector2.ZERO
+
+#Elegancko
+enum {ACTION_SKILL,ACTION_INFO,ACTION_ITEM,ACTION_ESCAPE}
+enum {SELECT_ITEM,SELECT_PROFILE,SELECT_CHARACTER}
+var MenuTypes = [
+	[SELECT_ITEM,SELECT_CHARACTER],
+	[SELECT_PROFILE],
+	[SELECT_ITEM,SELECT_CHARACTER],
+	[SELECT_ITEM]
+	]
+
+var CharacterTurn : int = 0
+var YourTurn = true
+#SelectAction
+var SelIndexAction : int = 0 
+
+#SelectItem
+var SelIndexItem : int = 0
+
+#SelectCharacter
+var SelIndexEnemy : int = 0 
+var SelIndexAlly : int = 0
+
+#ItemSeletion
+var TempItemList = []
+
+func _ready():
+	for i in 50:
+		TempItemList.append(i * 10)
+	TempItemList[0] = "Attack"
+	#what the fuck is wrong with control nodes, fuck this I will just wait I don't care
+	await get_tree().create_timer(0.05).timeout
+	#
+	BattleStart([0])
+	UpdateUi(0)
+
+func _process(delta):
+	UiMovement()
+	UiLayerHandle()
+
+func BattleStart(Enemies : Array)->void:
+	for i in Enemies:
+		pass
+
+func UiMovement()->void:
+	UiDir.x = float(Input.is_action_just_pressed("move_right"))-float(Input.is_action_just_pressed("move_left"))
+	UiDir.y = float(Input.is_action_just_pressed("move_down"))-float(Input.is_action_just_pressed("move_up"))
+	if UiDir:
+		if MenuLayer == 0:
+			SelIndexAction += UiDir.y
+			SelIndexAction = clamp(SelIndexAction,0,3)
+			UpdateUi(MenuLayer)
+		
+		if MenuLayer > 0:
+			match MenuTypes[SelIndexAction][MenuLayer-1]:
+				SELECT_ITEM:
+					ItemsMenuHandle()
+				SELECT_CHARACTER:
+					if EnemyList.get_child_count() > 0:
+						SelIndexEnemy += UiDir.x
+						SelIndexEnemy = clamp(SelIndexEnemy,0,EnemyList.get_child_count()-1)
+						UpdateUi(MenuLayer)
+
+func UiLayerHandle()->void:
+	if Input.is_action_just_pressed("accept"):
+		if MenuLayer < MenuTypes[SelIndexAction].size() and Cursor.size() > MenuLayer: 
+			Cursor[MenuLayer].AnimateCursor(true)
+		if MenuTypes[SelIndexAction].size() == MenuLayer:
+			CommitAction()
+		else:
+			MenuLayer += 1
+		if MenuTypes[SelIndexAction][MenuLayer-1] == SELECT_ITEM:
+			ItemsMenuHandle()
+	
+	if Input.is_action_just_pressed("back"):
+		if MenuLayer > 0 and Cursor.size() > MenuLayer-1: 
+			Cursor[MenuLayer-1].AnimateCursor(false)
+		
+		ResetMenuLayer(MenuLayer)
+		
+		MenuLayer -= 1
+	UpdateUi(MenuLayer)
+	MenuLayer = clamp(MenuLayer,0,MenuTypes[SelIndexAction].size())
+
+func UpdateUi(Layer:int)->void:
+	if Layer == 0:
+		Cursor[Layer].SetCursorFromIndex(SelIndexAction)
+	if Layer > 0:
+		match MenuTypes[SelIndexAction][Layer-1]:
+			SELECT_ITEM:
+				Cursor[Layer].SetCursorFromIndex(SelIndexItem%8)
+			SELECT_CHARACTER:
+				var AnimSprite
+				for i in EnemyList.get_children().size():
+					AnimSprite = EnemyList.get_child(i).get_child(0)
+					AnimSprite.material.set_shader_parameter("FlashOn",false)
+				AnimSprite = EnemyList.get_child(SelIndexEnemy).get_child(0)
+				AnimSprite.material.set_shader_parameter("FlashOn",true)
+
+##Items - Layer
+func UpdateItems()->void:
+	ClearItems()
+	for i in min(TempItemList.size(),ITEMS_PER_PAGE):
+		if i+floor(SelIndexItem/ITEMS_PER_PAGE)*ITEMS_PER_PAGE > TempItemList.size()-1:
+			break
+		var IInst = ItemScene.instantiate()
+		IInst.get_node("Label").text = str(TempItemList[i+floor(SelIndexItem/ITEMS_PER_PAGE)*ITEMS_PER_PAGE])
+		ListItems.add_child(IInst)
+	#Arrow indicators
+	if !(ceil(SelIndexItem/ITEMS_PER_PAGE)*ITEMS_PER_PAGE > TempItemList.size()-3):
+		MIArrow.visible = true
+	else:
+		MIArrow.visible = false
+	
+	if SelIndexItem >= 8:
+		PIArrow.visible = true
+	else:
+		PIArrow.visible = false
+
+func ClearItems():
+	for i in ListItems.get_children():
+		i.queue_free()
+
+#0 Skills - 1 PlayerInfo - 2 Items - 3 Escape
+func ItemsMenuHandle()->void:
+	if ListItems.get_children().size() > 0:
+		SelIndexItem += UiDir.x
+		SelIndexItem += NUM_COLUMNS_ITEMS * UiDir.y
+		SelIndexItem = clamp(SelIndexItem,0,TempItemList.size()-1)
+	UpdateItems()
+	await get_tree().process_frame
+	UpdateUi(MenuLayer)
+	await get_tree().process_frame
+	if Cursor[1].visible == false:
+		Cursor[1].visible = true
+##EndItems
+
+func ResetCursor(Layer):
+	Cursor[Layer].global_position = Vector2.ZERO
+	Cursor[Layer].size = Vector2.ZERO
+	Cursor[Layer].pivot_offset = Vector2.ZERO
+
+func CommitAction():
+	MenuLayer = 0
+	SkillDB.Skill_Attack.UseSkill()
+	ResetMenuLayer(-1)
+	Cursor[0].AnimateCursor(false)
+	Cursor[1].AnimateCursor(false)
+	
+	SelIndexItem = 0
+	SelIndexAction = 0
+
+
+#-1 to Reset all layers
+func ResetMenuLayer(Layer):
+	if Layer > 0:
+		match MenuTypes[SelIndexAction][Layer-1]:
+			SELECT_ITEM:
+				ClearItems()
+				ResetCursor(1)
+				Cursor[1].visible = false
+				MIArrow.visible = false
+				PIArrow.visible = false
+				SelIndexItem = 0
+			SELECT_CHARACTER:
+				var AnimSprite
+				for i in EnemyList.get_children().size():
+					AnimSprite = EnemyList.get_child(i).get_child(0)
+					AnimSprite.material.set_shader_parameter("FlashOn",false)
+	if Layer == -1:
+		#
+		ClearItems()
+		ResetCursor(1)
+		Cursor[1].visible = false
+		MIArrow.visible = false
+		PIArrow.visible = false
+		SelIndexItem = 0
+		#
+		var AnimSprite
+		for i in EnemyList.get_children().size():
+			AnimSprite = EnemyList.get_child(i).get_child(0)
+			AnimSprite.material.set_shader_parameter("FlashOn",false)
