@@ -1,13 +1,15 @@
 extends CharacterBody2D
 
-var MaxSpeed = 200
+var MaxSpeed = 240
 
 var Speed = 220
 
 @onready var Sprite = $AnimatedSprite2D
+@onready var Cam = $Camera2D
 
 func _ready():
 	motion_mode = MOTION_MODE_FLOATING
+	SignalBus.ChangeScene.connect(ChangeScene)
 
 func _process(delta):
 	
@@ -18,11 +20,17 @@ func _process(delta):
 		if Sprite.animation != "default_walk":
 			Sprite.play("default_walk")
 		
-		velocity += Dir.normalized() * Speed * delta * 13
+		velocity += Dir.normalized() * Speed * delta * 15
 	else:
 		if Sprite.animation != "default":
 			Sprite.animation = "default"
-	velocity = velocity.move_toward(Vector2.ZERO,Speed * delta * 7)
+	velocity = velocity.move_toward(Vector2.ZERO,Speed * delta * 10)
 	velocity = velocity.limit_length(MaxSpeed)
 	
 	move_and_slide()
+
+func ChangeScene(To):
+	get_tree().call_deferred("change_scene_to_file",To)
+
+func SetCamLimit():
+	pass

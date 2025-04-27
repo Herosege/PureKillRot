@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://ipnlocud1onv"]
+
+[ext_resource type="Script" uid="uid://bab03rpjb8073" path="res://Script/EventNode.gd" id="1_eq1n1"]
+
+[node name="EventNode" type="Node2D"]
+script = ExtResource("1_eq1n1")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+
+[node name="EvArea" type="Area2D" parent="."]
+process_priority = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EvArea"]
+
+[connection signal="body_entered" from="EvArea" to="." method="_on_ev_area_body_entered"]
+[connection signal="body_exited" from="EvArea" to="." method="_on_ev_area_body_exited"]

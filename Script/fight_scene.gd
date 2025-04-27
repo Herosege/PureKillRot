@@ -53,7 +53,7 @@ func _ready():
 	#what the fuck is wrong with control nodes, fuck this I will just wait I don't care
 	await get_tree().create_timer(0.05).timeout
 	#
-	BattleStart([0],"Two [color=red]Curses[/color] attack you!")
+	BattleStart([0],"something is really wrong")
 	UpdateUi(0)
 	GenProfiles()
 

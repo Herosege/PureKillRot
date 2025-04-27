@@ -114,7 +114,8 @@ func EndDialogue():
 	get_tree().paused = false
 	Globals.InDialogue = false
 	AnimateBox(false)
-	SignalBus.emit_signal("DialFinish")
+	SignalBus.emit_signal("EventConclude")
+	#SignalBus.emit_signal("DialFinish")
 
 func _on_disappear_timer_timeout():
 	EndDialogue()

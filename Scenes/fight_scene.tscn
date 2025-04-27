@@ -1,12 +1,8 @@
-[gd_scene load_steps=16 format=3 uid="uid://bfmxkonlnbgpe"]
+[gd_scene load_steps=10 format=3 uid="uid://bfmxkonlnbgpe"]
 
-[ext_resource type="Texture2D" uid="uid://cyieb1qtdxjv" path="res://Assets/Tilemaps/tilemap2.png" id="1_2tkjd"]
 [ext_resource type="Script" uid="uid://d0lg86i44nlqy" path="res://Script/fight_scene.gd" id="1_43a11"]
-[ext_resource type="Texture2D" uid="uid://cw0k254lt0fy7" path="res://Assets/Sprites/Enemy/Enemy1.png" id="2_dja7d"]
+[ext_resource type="Texture2D" uid="uid://vcffjq82m6qu" path="res://Assets/Images/fs.jpg" id="2_78axv"]
 [ext_resource type="PackedScene" uid="uid://nc7u0wtwxqmo" path="res://Scenes/UIElements/enemy.tscn" id="3_mo3wy"]
-[ext_resource type="Texture2D" uid="uid://blus7aljrc03j" path="res://Assets/Sprites/Enemy/Enemy3.png" id="4_32gp2"]
-[ext_resource type="Shader" uid="uid://dy0oe7rxlvpmv" path="res://Resources/Shaders/EnemyBattleShader.gdshader" id="4_i8l4g"]
-[ext_resource type="Texture2D" uid="uid://bectm3npxo3o1" path="res://Assets/Sprites/Enemy/Enemy2.png" id="5_36w3u"]
 [ext_resource type="PackedScene" uid="uid://bp77o3susnype" path="res://Scenes/UIElements/cursor.tscn" id="7_fwfnk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uxmv6"]
@@ -30,30 +26,6 @@ font_size = 20
 
 [sub_resource type="LabelSettings" id="LabelSettings_1kdeu"]
 font_size = 20
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_mcb1c"]
-shader = ExtResource("4_i8l4g")
-shader_parameter/FlashOn = false
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_7hqdl"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("2_dja7d")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_36w3u")
-}, {
-"duration": 1.0,
-"texture": ExtResource("4_32gp2")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_36w3u")
-}],
-"loop": true,
-"name": &"default",
-"speed": 5.0
-}]
 
 [node name="Battle" type="Control"]
 layout_mode = 3
@@ -83,7 +55,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("1_2tkjd")
+texture = ExtResource("2_78axv")
 metadata/_edit_lock_ = true
 
 [node name="SelectAction" type="MarginContainer" parent="UI"]
@@ -435,20 +407,8 @@ alignment = 1
 metadata/_edit_lock_ = true
 
 [node name="Enemy" parent="Enemies/MarginContainer/EnemyList" instance=ExtResource("3_mo3wy")]
+custom_minimum_size = Vector2(150, 200)
 layout_mode = 2
-
-[node name="Enemy2" type="Control" parent="Enemies/MarginContainer/EnemyList"]
-custom_minimum_size = Vector2(150, 150)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 8
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Enemies/MarginContainer/EnemyList/Enemy2"]
-material = SubResource("ShaderMaterial_mcb1c")
-scale = Vector2(1.5, 1.5)
-sprite_frames = SubResource("SpriteFrames_7hqdl")
-autoplay = "default"
-centered = false
 
 [node name="Cursor" parent="." instance=ExtResource("7_fwfnk")]
 layout_mode = 0

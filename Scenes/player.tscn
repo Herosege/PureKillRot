@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://n7fwdscbrrnq"]
+[gd_scene load_steps=7 format=3 uid="uid://n7fwdscbrrnq"]
 
 [ext_resource type="Script" uid="uid://dd02fg18e1hpv" path="res://Script/player.gd" id="1_7uqau"]
-[ext_resource type="Texture2D" uid="uid://c2kvgv6kr1yxh" path="res://Assets/Sprites/me1.png" id="2_cvnsp"]
+[ext_resource type="Texture2D" uid="uid://c2kvgv6kr1yxh" path="res://Assets/Sprites/CharactersOW/me1.png" id="2_cvnsp"]
+[ext_resource type="Texture2D" uid="uid://cfeeijw4jiodp" path="res://Assets/Sprites/CharactersOW/walk1.png" id="3_vgqql"]
+[ext_resource type="Texture2D" uid="uid://bxsdbj6bfixnx" path="res://Assets/Sprites/CharactersOW/walk2.png" id="4_fkybt"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2k4lj"]
 size = Vector2(32, 24)
@@ -18,7 +20,10 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_cvnsp")
+"texture": ExtResource("3_vgqql")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_fkybt")
 }],
 "loop": true,
 "name": &"default_walk",
@@ -39,5 +44,6 @@ shape = SubResource("RectangleShape2D_2k4lj")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(4, 16)
 sprite_frames = SubResource("SpriteFrames_okuqu")
+frame_progress = 0.0173994
 offset = Vector2(0, -32)
 metadata/_edit_lock_ = true

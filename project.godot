@@ -25,6 +25,7 @@ CharDB="*res://Script/GlobalClasses/CharacterDatabase.gd"
 ItemDB="*res://Script/GlobalClasses/ItemDatabase.gd"
 PartyInfo="*res://Script/GlobalClasses/PartyInfo.gd"
 Inventory="*res://Script/GlobalClasses/Inventory.gd"
+EventHandler="*res://Script/GlobalClasses/EventHandler.gd"
 
 [display]
 
