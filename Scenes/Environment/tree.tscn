@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b5tohn3yn3xbh"]
 
-[ext_resource type="Texture2D" uid="uid://c0h4sngtdgn0s" path="res://Assets/Sprites/Environment/tree1.png" id="1_055k5"]
+[ext_resource type="Texture2D" uid="uid://c0h4sngtdgn0s" path="res://Assets/Textures/Environment/tree1.png" id="1_055k5"]
 
 [node name="Tree" type="Node2D"]
 scale = Vector2(1.5, 1.5)

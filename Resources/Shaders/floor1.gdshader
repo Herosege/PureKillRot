@@ -24,5 +24,5 @@ void vertex(){
 void fragment() {
 	vec3 VorVal = texture(Vornoi,UV).xyz;
 	float VorAngle = VorVal.x;
-	COLOR.rgba = texture(TEXTURE,rotateUV(UV,vec2(VorAngle),9.0)*2.0)*texture(ColorTex,UV)+0.04;
+	COLOR.rgba = texture(TEXTURE,rotateUV(UV,vec2(VorAngle),6.0)*vec2(2.0,3.0))*texture(ColorTex,UV)+0.04;
 }

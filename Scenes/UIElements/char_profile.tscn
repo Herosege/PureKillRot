@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://b461j4ney5bsb"]
 
 [ext_resource type="Script" uid="uid://b73s70xssf4a6" path="res://Script/UIElements/char_profile.gd" id="1_44v3o"]
-[ext_resource type="Texture2D" uid="uid://bls8cn6je3t52" path="res://Assets/Icons/Othenson.png" id="1_deygv"]
+[ext_resource type="Texture2D" uid="uid://bls8cn6je3t52" path="res://Assets/Textures/Sprites_battle/Icons/Othenson.png" id="1_deygv"]
 [ext_resource type="Shader" uid="uid://bxaygjvv1hcr1" path="res://Resources/Shaders/char_profile_border.gdshader" id="2_alxar"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hovjx"]
@@ -75,8 +75,6 @@ vertical_alignment = 1
 
 [node name="Label" type="Label" parent="StatsPicture/VBoxContainer"]
 layout_mode = 2
-text = "100"
 
 [node name="Label2" type="Label" parent="StatsPicture/VBoxContainer"]
 layout_mode = 2
-text = "100"

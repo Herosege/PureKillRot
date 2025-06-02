@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://e55yhkovq1g7"]
 
 [ext_resource type="Script" uid="uid://dykt2u38tm08n" path="res://Script/menu.gd" id="1_qd5w8"]
-[ext_resource type="Texture2D" uid="uid://bls8cn6je3t52" path="res://Assets/Icons/Othenson.png" id="1_unlas"]
+[ext_resource type="Texture2D" uid="uid://bls8cn6je3t52" path="res://Assets/Textures/Sprites_battle/Icons/Othenson.png" id="1_unlas"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alioa"]
 bg_color = Color(0, 0, 0, 0.470588)

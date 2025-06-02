@@ -54,3 +54,5 @@ func _init(aa,bb,a,b,c,d,e,Sk = []):
 	MentalStrength = d
 	Defence = e
 	Skills = Sk
+	PhysicalHealth = MaxPhysicalHealth
+	MentalHealth = MaxMentalHealth

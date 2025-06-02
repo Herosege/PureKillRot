@@ -8,29 +8,29 @@ func GetSkill(ID:int)->Skill:
 var Err = Skill.new(
 	"TissueSlap",
 	"This is an error! sorry!",
-	load("res://Assets/Sprites/npcs/someone.png"),
-	func Eff():
-		pass
+	load("res://Assets/Textures/Environment/bush2.png"),
+	Enums.TSkill.Damage,
+	[100,0]
 )
 
 var Skill_Attack = Skill.new(
 	"Attack",
 	"Deal damage to your opponent",
-	load("res://Assets/Images/grass.png"),
-	func Eff():
-		print("77KrowaBuggati!!2")
+	load("res://Assets/Textures/Environment/bush2.png"),
+	Enums.TSkill.Damage,
+	[500,0]
 )
 var Skill_Defend = Skill.new(
 	"Defend",
 	"Reduce incoming damage",
-	load("res://Assets/Sprites/npcs/someone.png"),
-	func Eff():
-		print("OBRONA!!!")
+	load("res://Assets/Textures/Environment/bush2.png"),
+	Enums.TSkill.Damage,
+	[100,0]
 )
 var Skill_FastAttack = Skill.new(
 	"FastAttack",
 	"Induces bleeding",
-	load("res://Assets/Sprites/npcs/player1.png"),
-	func Eff():
-		print("wu//Assets/Sp")
+	load("res://Assets/Textures/Environment/bush2.png"),
+	Enums.TSkill.Damage,
+	[100,0]
 )

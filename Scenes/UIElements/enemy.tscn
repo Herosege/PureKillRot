@@ -1,29 +1,23 @@
 [gd_scene load_steps=5 format=3 uid="uid://nc7u0wtwxqmo"]
 
+[ext_resource type="Script" uid="uid://dhqxf17elgmrs" path="res://Script/UIElements/enemy.gd" id="1_58iqw"]
 [ext_resource type="Shader" uid="uid://dy0oe7rxlvpmv" path="res://Resources/Shaders/EnemyBattleShader.gdshader" id="1_320pc"]
-[ext_resource type="Texture2D" uid="uid://7oj70jan0qjh" path="res://Assets/Sprites/Enemy/enemy_cross_1.png" id="2_y8q68"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8xthn"]
+resource_local_to_scene = true
 shader = ExtResource("1_320pc")
 shader_parameter/FlashOn = false
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_7hqdl"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("2_y8q68")
-}],
-"loop": true,
-"name": &"default",
-"speed": 5.0
-}]
 
 [node name="Enemy" type="Control"]
-custom_minimum_size = Vector2(150, 150)
 layout_mode = 3
 anchors_preset = 0
+offset_right = 150.0
+offset_bottom = 150.0
 size_flags_horizontal = 4
 size_flags_vertical = 8
+script = ExtResource("1_58iqw")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 material = SubResource("ShaderMaterial_8xthn")

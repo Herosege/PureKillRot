@@ -13,6 +13,8 @@ const ITEMS_PER_PAGE = 8
 #0-ActionMenu ; 1-ItemMenu ; 2-ProfileMenu
 @onready var Cursor = get_tree().get_nodes_in_group("Cursor")
 
+@onready var OverlayColor = get_node("Overlay/ColorRect")
+
 @onready var ItemScene = load("res://Scenes/UIElements/item.tscn") 
 
 #Action -> Select Item -> EnemySelect
@@ -49,15 +51,37 @@ var TempItemList = []
 
 var StartMessage : String
 
+#Passed arguments
+var BattleText = ""
+var BattleEnemies = []
+
+#ActionBuffer - [ID,type] - type   0:character 1:enemy
+var ActionBuffer : Array
+
+#DownTextbox
+enum TBM {std_text,char_info}
+var TextboxMode = TBM.std_text
+
+var TextToSet = ""
+var AwaitInptToEnd = false
+
+func _enter_tree():
+	$Overlay.visible = true
+
 func _ready():
 	#what the fuck is wrong with control nodes, fuck this I will just wait I don't care
 	await get_tree().create_timer(0.05).timeout
 	#
-	BattleStart([0],"something is really wrong")
+	BattleStart([0,0],BattleText)
 	UpdateUi(0)
 	GenProfiles()
 
 func _process(delta):
+	if AwaitInptToEnd and Input.is_action_just_pressed("accept"):
+		ExitBattleScene()
+	if OverlayColor.color.a>0.0:
+		OverlayColor.color.a = lerp(OverlayColor.color.a,0.0,1.5*delta)
+	TextBoxHandle(delta)
 	UiMovement()
 	UiLayerHandle()
 
@@ -66,15 +90,23 @@ var CharProfile = load("res://Scenes/UIElements/char_profile.tscn")
 func GenProfiles():
 	for i in PartyInfo.MainParty.size():
 		var CharPInst = CharProfile.instantiate()
-		ProfilesArr.append(CharPInst)
-		UpdateProfile(i)
+		var CChar = PartyInfo.MainParty[i]
+		CharPInst.SetImage(CChar.Icon)
+		CharPInst.SetName(CChar.Name)
+		CharPInst.SetHealth(CChar.PhysicalHealth,CChar.MentalHealth)
 		CharProfs.add_child(CharPInst)
 
 func BattleStart(Enemies : Array,Msg : String)->void:
-	for i in Enemies:
-		pass
+	var EnemyScene = load("res://Scenes/UIElements/enemy.tscn")
+	for i in Enemies.size():
+		var EnemySceneInst = EnemyScene.instantiate()
+		var EnemyFromID = EnemyDB.GetEnemyNew(Enemies[i])
+		BattleEnemies.append(EnemyFromID)
+		EnemySceneInst.ESprites = EnemyFromID.Sprites
+		
+		EnemyList.add_child(EnemySceneInst)
 	StartMessage = Msg
-	DPMessage.text = StartMessage
+	TextToSet = StartMessage
 
 func UiMovement()->void:
 	UiDir.x = float(Input.is_action_just_pressed("move_right"))-float(Input.is_action_just_pressed("move_left"))
@@ -105,7 +137,13 @@ func UiLayerHandle()->void:
 		if MenuLayer < MenuTypes[SelIndexAction].size() and Cursor.size() > MenuLayer: 
 			AnimateCursor(true,MenuLayer)
 		if MenuTypes[SelIndexAction].size() == MenuLayer:
-			CommitAction()
+			if !(SelIndexAction == SELECT_PROFILE):
+				CharacterTurn += 1
+				ActionBuffer.append([TempItemList[SelIndexItem],0])
+				if PartyInfo.MainParty.size() <= CharacterTurn:
+					CommitActions()
+					CharacterTurn = 0
+					ActionBuffer.resize(0)
 		else:
 			MenuLayer += 1
 		if MenuTypes[SelIndexAction][MenuLayer-1] == SELECT_ITEM:
@@ -187,16 +225,20 @@ func ResetCursor(Layer):
 	Cursor[Layer].size = Vector2.ZERO
 	Cursor[Layer].pivot_offset = Vector2.ZERO
 
-func CommitAction():
-	match SelIndexAction:
-		ACTION_SKILL:
-			SkillDB.GetSkill(TempItemList[SelIndexItem]).UseSkill()
-		ACTION_INFO:
-			pass
-		ACTION_ITEM:
-			pass
-		ACTION_SPECIAL:
-			pass
+func CommitActions():
+	for i in ActionBuffer.size():
+		if ActionBuffer[i][1] == 0:
+			match SelIndexAction:
+				ACTION_SKILL:
+					SkillUse(ActionBuffer[i][0])
+				ACTION_INFO:
+					pass
+				ACTION_ITEM:
+					pass
+				ACTION_SPECIAL:
+					pass
+		else:
+			SkillUse(ActionBuffer[i][0])
 	
 	MenuLayer = 0
 	
@@ -254,12 +296,6 @@ func GenerateItemList(Char:Character):
 		ACTION_SPECIAL:
 			pass
 
-func UpdateProfile(PIndex):
-	var Prof = ProfilesArr[PIndex]
-	Prof.SetImage(PartyInfo.MainParty[PIndex].Icon)
-	Prof.SetName(PartyInfo.MainParty[PIndex].Name)
-	Prof.SetHealth(PartyInfo.MainParty[PIndex].PhysicalHealth,PartyInfo.MainParty[PIndex].MentalHealth)
-
 func CheckAction()->bool:
 	match SelIndexAction:
 		ACTION_SKILL:
@@ -285,3 +321,52 @@ func AnimateCursor(SetAnim:bool,Layer:int):
 				Cursor[1].AnimateCursor(SetAnim)
 			ACTION_SPECIAL:
 				Cursor[1].AnimateCursor(SetAnim)
+
+func SkillUse(SkillT):
+	var Effect = SkillDB.GetSkill(SkillT).Effect
+	var Vals = SkillDB.GetSkill(SkillT).Values
+	match Effect:
+		Enums.TSkill.Damage:
+			var EnemyType = BattleEnemies[SelIndexEnemy]
+			EnemyType.TakeDamage(Vals[0])
+			var EnemName = str(EnemyType.Name) if BattleEnemies.size() <= 1 else str(EnemyType.Name) + "_" + str(SelIndexEnemy+1)
+			SignalBus.emit_signal("AnnounceAction",EnemName + " took " + str(Vals[0]) + " Damage!")
+			if EnemyType.Health <= 0:
+				SignalBus.emit_signal("AnnounceAction",EnemName + " died")
+				EnemyDie(SelIndexEnemy)
+			if BattleEnemies.size() == 0:
+				BattleEnd()
+
+func EnemyDie(Index):
+	BattleEnemies.remove_at(Index)
+	EnemyList.get_child(Index).queue_free()
+
+func BattleEnd():
+	TextToSet = "You won!"
+	AwaitInptToEnd = true
+
+func ExitBattleScene():
+	SignalBus.emit_signal("EndBattle")
+	queue_free()
+
+var NewTextSwitch = true
+var PrevTTS = ""
+
+func TextBoxHandle(delta):
+	if !TextToSet.is_empty() and TextboxMode == TBM.std_text:
+		if !PrevTTS.is_empty() and TextToSet != PrevTTS:
+			NewTextSwitch = true
+		PrevTTS = TextToSet
+		if NewTextSwitch:
+			DPMessage.text = ""
+			NewTextSwitch = false
+			Globals.TextTime = 0.0
+			Globals.TextIndex = 0
+			Globals.CharTime = Globals.TEXTSCROLLTIME
+			Globals.LettersAtTime = 0.0
+		var Char = Globals.ScrollText(TextToSet,delta)
+		#print(Char,"abba")
+		DPMessage.text += Char
+		if Globals.CurText.is_empty():
+			TextToSet = ""
+			NewTextSwitch = true

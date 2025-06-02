@@ -48,5 +48,4 @@ func OnDialFinish():
 		ADial.GiveItem:
 			pass
 		ADial.ChangeScene:
-			print(AfterDial)
 			get_tree().call_deferred("change_scene_to_file",SceneTo)

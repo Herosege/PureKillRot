@@ -2,7 +2,7 @@ extends Node
 
 const MAX_PARTY_SIZE = 4
 
-@onready var MainParty = [CharDB.Char_Me] 
+@onready var MainParty = [CharDB.GetCharNew(0)] 
 
 var Items = []
 

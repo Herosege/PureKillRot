@@ -1,8 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://bfmxkonlnbgpe"]
+[gd_scene load_steps=11 format=3 uid="uid://bfmxkonlnbgpe"]
 
 [ext_resource type="Script" uid="uid://d0lg86i44nlqy" path="res://Script/fight_scene.gd" id="1_43a11"]
-[ext_resource type="Texture2D" uid="uid://vcffjq82m6qu" path="res://Assets/Images/fs.jpg" id="2_78axv"]
-[ext_resource type="PackedScene" uid="uid://nc7u0wtwxqmo" path="res://Scenes/UIElements/enemy.tscn" id="3_mo3wy"]
+[ext_resource type="Texture2D" uid="uid://dbbp3lwlsb60m" path="res://Assets/Textures/Images/plains.png" id="2_1a0q2"]
+[ext_resource type="Script" uid="uid://bfma5jes48a7e" path="res://Script/UIElements/action_feed.gd" id="4_78axv"]
+[ext_resource type="Script" uid="uid://c7w0acnucx853" path="res://Script/handle_fight_events.gd" id="5_11mp3"]
 [ext_resource type="PackedScene" uid="uid://bp77o3susnype" path="res://Scenes/UIElements/cursor.tscn" id="7_fwfnk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uxmv6"]
@@ -55,7 +56,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_78axv")
+texture = ExtResource("2_1a0q2")
 metadata/_edit_lock_ = true
 
 [node name="SelectAction" type="MarginContainer" parent="UI"]
@@ -375,7 +376,6 @@ metadata/_edit_lock_ = true
 [node name="Message" type="RichTextLabel" parent="UI/Explanation/Panel/MarginContainer" groups=["DownPanelMessage"]]
 layout_mode = 2
 bbcode_enabled = true
-text = "Abbasimolai [color=blue]Michał[/color]"
 
 [node name="Enemies" type="Control" parent="."]
 layout_mode = 1
@@ -403,12 +403,9 @@ metadata/_edit_lock_ = true
 
 [node name="EnemyList" type="HBoxContainer" parent="Enemies/MarginContainer" groups=["EnemyList"]]
 layout_mode = 2
+theme_override_constants/separation = 0
 alignment = 1
 metadata/_edit_lock_ = true
-
-[node name="Enemy" parent="Enemies/MarginContainer/EnemyList" instance=ExtResource("3_mo3wy")]
-custom_minimum_size = Vector2(150, 200)
-layout_mode = 2
 
 [node name="Cursor" parent="." instance=ExtResource("7_fwfnk")]
 layout_mode = 0
@@ -430,3 +427,54 @@ anchors_preset = 0
 anchor_right = 0.0
 anchor_bottom = 0.0
 ParentPath = NodePath("../UI/SelectStuff/Panel/MarginContainer/CharProfiles")
+
+[node name="Overlay" type="Control" parent="."]
+visible = false
+z_index = 3
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="ActionFeed" type="Control" parent="."]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 0.346
+offset_bottom = -0.12001
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_78axv")
+
+[node name="MarginContainer" type="MarginContainer" parent="ActionFeed"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ActionFeed/MarginContainer"]
+modulate = Color(1, 1, 1, 0.607843)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 5
+
+[node name="HandleFightEvents" type="Node" parent="."]
+script = ExtResource("5_11mp3")
