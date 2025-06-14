@@ -21,6 +21,8 @@ const ITEMS_PER_PAGE = 8
 var MenuLayer : int = 0 
 var UiDir : Vector2 = Vector2.ZERO
 
+var Turn = 0
+
 #Elegancko
 enum {ACTION_SKILL,ACTION_INFO,ACTION_ITEM,ACTION_SPECIAL}
 enum {SELECT_ITEM,SELECT_PROFILE,SELECT_CHARACTER}
@@ -31,6 +33,7 @@ var MenuTypes = [
 	[SELECT_ITEM]
 	]
 
+var FightParty = []
 var CharacterTurn : int = 0
 var YourTurn = true
 
@@ -55,7 +58,7 @@ var StartMessage : String
 var BattleText = ""
 var BattleEnemies = []
 
-#ActionBuffer - [ID,type] - type   0:character 1:enemy
+#ActionBuffer - [ID,type,target] - type   0:character 1:enemy
 var ActionBuffer : Array
 
 #DownTextbox
@@ -63,7 +66,9 @@ enum TBM {std_text,char_info}
 var TextboxMode = TBM.std_text
 
 var TextToSet = ""
-var AwaitInptToEnd = false
+var AwaitInptToEnd = 0
+
+var HaltAction = false
 
 func _enter_tree():
 	$Overlay.visible = true
@@ -78,12 +83,13 @@ func _ready():
 
 func _process(delta):
 	if AwaitInptToEnd and Input.is_action_just_pressed("accept"):
-		ExitBattleScene()
+		ExitBattleScene(AwaitInptToEnd)
 	if OverlayColor.color.a>0.0:
 		OverlayColor.color.a = lerp(OverlayColor.color.a,0.0,1.5*delta)
 	TextBoxHandle(delta)
-	UiMovement()
-	UiLayerHandle()
+	if !HaltAction:
+		UiMovement()
+		UiLayerHandle()
 
 var CharProfile = load("res://Scenes/UIElements/char_profile.tscn")
 
@@ -107,6 +113,8 @@ func BattleStart(Enemies : Array,Msg : String)->void:
 		EnemyList.add_child(EnemySceneInst)
 	StartMessage = Msg
 	TextToSet = StartMessage
+
+### MAIN UI HANDLE ------------------------------------------------------------------------------------------------------
 
 func UiMovement()->void:
 	UiDir.x = float(Input.is_action_just_pressed("move_right"))-float(Input.is_action_just_pressed("move_left"))
@@ -138,8 +146,12 @@ func UiLayerHandle()->void:
 			AnimateCursor(true,MenuLayer)
 		if MenuTypes[SelIndexAction].size() == MenuLayer:
 			if !(SelIndexAction == SELECT_PROFILE):
+				ActionBuffer.append([TempItemList[SelIndexItem],0,SelIndexEnemy])
+				
 				CharacterTurn += 1
-				ActionBuffer.append([TempItemList[SelIndexItem],0])
+				while PartyInfo.MainParty[min(CharacterTurn,PartyInfo.MainParty.size()-1)].Dead == true and !PartyInfo.MainParty.size()-1 <= CharacterTurn:
+					CharacterTurn += 1
+				ResetMenu()
 				if PartyInfo.MainParty.size() <= CharacterTurn:
 					CommitActions()
 					CharacterTurn = 0
@@ -182,7 +194,22 @@ func UpdateUi(Layer:int)->void:
 				AnimSprite = EnemyList.get_child(SelIndexEnemy).get_child(0)
 				AnimSprite.material.set_shader_parameter("FlashOn",true)
 
-##Items - Layer
+func UpdateProfiles():
+	for i in CharProfs.get_children().size():
+		CharProfs.get_child(i).SetHealth(PartyInfo.MainParty[i].PhysicalHealth,PartyInfo.MainParty[i].MentalHealth)
+
+func ResetMenu():
+	MenuLayer = 0
+	
+	ResetMenuLayer(-1)
+	for i in Cursor.size():
+		Cursor[i].AnimateCursor(false)
+	
+	SelIndexItem = 0
+	SelIndexAction = 0
+
+### ITEMS HANDLE ------------------------------------------------------------------------------------------------------
+
 func UpdateItems()->void:
 	ClearItems()
 	for i in min(TempItemList.size(),ITEMS_PER_PAGE):
@@ -218,19 +245,61 @@ func ItemsMenuHandle()->void:
 	await get_tree().process_frame
 	if Cursor[1].visible == false:
 		Cursor[1].visible = true
-##EndItems
+
+func GenerateItemList(Char:Character):
+	TempItemList.resize(0)
+	match SelIndexAction:
+		ACTION_SKILL:
+			for i in Char.Skills.size():
+				TempItemList.append(Char.Skills[i])
+		ACTION_ITEM:
+			pass
+		ACTION_SPECIAL:
+			pass
+
+
+func CheckAction()->bool:
+	match SelIndexAction:
+		ACTION_SKILL:
+			return true if PartyInfo.MainParty[CharacterTurn].Skills else false
+		ACTION_INFO:
+			return true if PartyInfo.MainParty[CharacterTurn] else false
+		ACTION_ITEM:
+			return true if PartyInfo.Items else false
+		ACTION_SPECIAL:
+			return true if PartyInfo.MainParty[CharacterTurn].Special else false
+	return false
+
+### CURSOR ------------------------------------------------------------------------------------------------------
+
+func AnimateCursor(SetAnim:bool,Layer:int):
+	if Layer == 0:
+		Cursor[0].AnimateCursor(SetAnim)
+	if Layer > 0:
+		match SelIndexAction:
+			ACTION_SKILL:
+				Cursor[1].AnimateCursor(SetAnim)
+			ACTION_INFO:
+				Cursor[2].AnimateCursor(SetAnim)
+			ACTION_ITEM:
+				Cursor[1].AnimateCursor(SetAnim)
+			ACTION_SPECIAL:
+				Cursor[1].AnimateCursor(SetAnim)
 
 func ResetCursor(Layer):
 	Cursor[Layer].global_position = Vector2.ZERO
 	Cursor[Layer].size = Vector2.ZERO
 	Cursor[Layer].pivot_offset = Vector2.ZERO
 
+### ACTIONS ------------------------------------------------------------------------------------------------------
+
 func CommitActions():
+	GenEnemyActions()
 	for i in ActionBuffer.size():
 		if ActionBuffer[i][1] == 0:
 			match SelIndexAction:
 				ACTION_SKILL:
-					SkillUse(ActionBuffer[i][0])
+					SkillUse(ActionBuffer[i])
 				ACTION_INFO:
 					pass
 				ACTION_ITEM:
@@ -238,17 +307,18 @@ func CommitActions():
 				ACTION_SPECIAL:
 					pass
 		else:
-			SkillUse(ActionBuffer[i][0])
-	
-	MenuLayer = 0
-	
-	ResetMenuLayer(-1)
-	for i in Cursor.size():
-		Cursor[i].AnimateCursor(false)
-	
-	SelIndexItem = 0
-	SelIndexAction = 0
+			SkillUse(ActionBuffer[i])
+	ResetMenu()
 
+func GenEnemyActions():
+	FightParty.resize(0)
+	for i in PartyInfo.MainParty.size():
+		if PartyInfo.MainParty[i].Dead == false:
+			FightParty.append(PartyInfo.MainParty.find(PartyInfo.MainParty[i]))
+	for i in BattleEnemies.size():
+		var TempBuf = BattleEnemies[i].RSkill(Turn,FightParty.size())
+		TempBuf[2] = FightParty[TempBuf[2]]
+		ActionBuffer.append(TempBuf)
 
 #-1 to Reset all layers
 func ResetMenuLayer(Layer):
@@ -285,69 +355,78 @@ func ResetMenuLayer(Layer):
 			AnimSprite = EnemyList.get_child(i).get_child(0)
 			AnimSprite.material.set_shader_parameter("FlashOn",false)
 
-func GenerateItemList(Char:Character):
-	TempItemList.resize(0)
-	match SelIndexAction:
-		ACTION_SKILL:
-			for i in Char.Skills.size():
-				TempItemList.append(Char.Skills[i])
-		ACTION_ITEM:
-			pass
-		ACTION_SPECIAL:
-			pass
-
-func CheckAction()->bool:
-	match SelIndexAction:
-		ACTION_SKILL:
-			return true if PartyInfo.MainParty[CharacterTurn].Skills else false
-		ACTION_INFO:
-			return true if PartyInfo.MainParty[CharacterTurn] else false
-		ACTION_ITEM:
-			return true if PartyInfo.Items else false
-		ACTION_SPECIAL:
-			return true if PartyInfo.MainParty[CharacterTurn].Special else false
-	return false
-
-func AnimateCursor(SetAnim:bool,Layer:int):
-	if Layer == 0:
-		Cursor[0].AnimateCursor(SetAnim)
-	if Layer > 0:
-		match SelIndexAction:
-			ACTION_SKILL:
-				Cursor[1].AnimateCursor(SetAnim)
-			ACTION_INFO:
-				Cursor[2].AnimateCursor(SetAnim)
-			ACTION_ITEM:
-				Cursor[1].AnimateCursor(SetAnim)
-			ACTION_SPECIAL:
-				Cursor[1].AnimateCursor(SetAnim)
-
 func SkillUse(SkillT):
-	var Effect = SkillDB.GetSkill(SkillT).Effect
-	var Vals = SkillDB.GetSkill(SkillT).Values
+	var Effect = SkillDB.GetSkill(SkillT[0]).Effect
+	var Vals = SkillDB.GetSkill(SkillT[0]).Values
+	var TargetArray = BattleEnemies if SkillT[1] == 1 else PartyInfo.MainParty
+	var TargetType = SkillT[2] 
+	var EnemyType = TargetArray[TargetType]
+	
 	match Effect:
 		Enums.TSkill.Damage:
-			var EnemyType = BattleEnemies[SelIndexEnemy]
-			EnemyType.TakeDamage(Vals[0])
-			var EnemName = str(EnemyType.Name) if BattleEnemies.size() <= 1 else str(EnemyType.Name) + "_" + str(SelIndexEnemy+1)
-			SignalBus.emit_signal("AnnounceAction",EnemName + " took " + str(Vals[0]) + " Damage!")
-			if EnemyType.Health <= 0:
-				SignalBus.emit_signal("AnnounceAction",EnemName + " died")
-				EnemyDie(SelIndexEnemy)
-			if BattleEnemies.size() == 0:
-				BattleEnd()
+			if EnemyType is Character:
+				if FightParty.size() <= 0:
+					BattleEnd(0)
+					return
+				if EnemyType.Dead == true:
+					TargetType = FightParty[randi()%FightParty.size()]
+					EnemyType = TargetArray[TargetType]
+				EnemyType.TakeDamage(Vals[0])
+				var EnemName = str(EnemyType.Name)
+				SignalBus.emit_signal("AnnounceAction",EnemName + " took " + str(Vals[0]) + " Damage!")
+				if EnemyType.PhysicalHealth <= 0:
+					SignalBus.emit_signal("AnnounceAction",EnemName + " died")
+					CharacterDie(TargetType)
+					UpdateProfiles()
+				if CheckPartyMembersDead():
+					BattleEnd(0)
+					return
+			else:
+				EnemyType.TakeDamage(Vals[0])
+				var EnemName = str(EnemyType.Name) if TargetArray.size() <= 1 else str(EnemyType.Name) + "_" + str(TargetType+1)
+				SignalBus.emit_signal("AnnounceAction",EnemName + " took " + str(Vals[0]) + " Damage!")
+				if EnemyType.Health <= 0:
+					SignalBus.emit_signal("AnnounceAction",EnemName + " died")
+					EnemyDie(TargetType)
+				if BattleEnemies.size() == 0:
+					BattleEnd(1)
+
+func CheckPartyMembersDead()->bool:
+	var DeadAmnt = 0
+	for i in PartyInfo.MainParty.size():
+		if PartyInfo.MainParty[i].Dead == true:
+			DeadAmnt+=1
+			if DeadAmnt >= PartyInfo.MainParty.size():
+				return true
+	return false
+
+### END STUFF ------------------------------------------------------------------------------------------------------
 
 func EnemyDie(Index):
 	BattleEnemies.remove_at(Index)
 	EnemyList.get_child(Index).queue_free()
 
-func BattleEnd():
-	TextToSet = "You won!"
-	AwaitInptToEnd = true
+func CharacterDie(Index):
+	FightParty.remove_at(FightParty.find(Index))
+	PartyInfo.MainParty[Index].Dead = true
+	CharProfs.get_child(Index).SetDead(true)
 
-func ExitBattleScene():
-	SignalBus.emit_signal("EndBattle")
+#0-lose   1-win
+func BattleEnd(type):
+	if type == 0:
+		HaltAction = true
+		TextToSet = "You lost"
+		AwaitInptToEnd = 1
+	else:
+		HaltAction = true
+		TextToSet = "You won!"
+		AwaitInptToEnd = 2
+
+func ExitBattleScene(type):
+	SignalBus.emit_signal("EndBattle",type)
 	queue_free()
+
+### TEXTBOX ------------------------------------------------------------------------------------------------------
 
 var NewTextSwitch = true
 var PrevTTS = ""

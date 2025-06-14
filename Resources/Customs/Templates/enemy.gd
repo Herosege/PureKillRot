@@ -18,3 +18,6 @@ func _init(a,b,c,d,e):
 	Health = c
 	Skills = d
 	AI = e
+
+func RSkill(turn,oppons):
+	return AI.call(turn,oppons)

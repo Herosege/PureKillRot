@@ -51,6 +51,12 @@ func InitiateBattle(Text):
 	await get_tree().create_timer(0.3).timeout
 	get_tree().paused = false
 
-func OnEndBattle():
-	if CSceneStore:
-		get_tree().root.add_child(CSceneStore)
+func OnEndBattle(type):
+	match type:
+		1:
+			if CSceneStore:
+				CSceneStore.queue_free()
+			get_tree().change_scene_to_file("res://Scenes/game_over.tscn")
+		2:
+			if CSceneStore:
+				get_tree().root.add_child(CSceneStore)

@@ -6,6 +6,8 @@ var Icon : CompressedTexture2D
 
 #Stats
 
+var Dead = false
+
 var MaxPhysicalHealth : float = 100.0
 var MaxMentalHealth : float = 100.0
 
@@ -56,3 +58,6 @@ func _init(aa,bb,a,b,c,d,e,Sk = []):
 	Skills = Sk
 	PhysicalHealth = MaxPhysicalHealth
 	MentalHealth = MaxMentalHealth
+
+func TakeDamage(amnt):
+	PhysicalHealth -= amnt

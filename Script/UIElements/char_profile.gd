@@ -21,3 +21,6 @@ func SetHealth(PH,MH):
 
 func SetSelected(type:bool):
 	$CurSelected.visible = type
+
+func SetDead(IsDead):
+	$DeadOverlay.visible = IsDead

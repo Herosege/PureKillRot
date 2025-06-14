@@ -12,6 +12,6 @@ signal ChangeScene(To)
 signal PassSkill
 signal AnnounceAction(Text)
 
-signal EndBattle
+signal EndBattle(type)
 
 signal EnemyKYS

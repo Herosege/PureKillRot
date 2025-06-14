@@ -1,0 +1,480 @@
+[gd_scene load_steps=11 format=3 uid="uid://bfmxkonlnbgpe"]
+
+[ext_resource type="Script" uid="uid://d0lg86i44nlqy" path="res://Script/fight_scene.gd" id="1_43a11"]
+[ext_resource type="Texture2D" uid="uid://dbbp3lwlsb60m" path="res://Assets/Textures/Images/plains.png" id="2_1a0q2"]
+[ext_resource type="Script" uid="uid://bfma5jes48a7e" path="res://Script/UIElements/action_feed.gd" id="4_78axv"]
+[ext_resource type="Script" uid="uid://c7w0acnucx853" path="res://Script/handle_fight_events.gd" id="5_11mp3"]
+[ext_resource type="PackedScene" uid="uid://bp77o3susnype" path="res://Scenes/UIElements/cursor.tscn" id="7_fwfnk"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uxmv6"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0.616283, 0.164216, 0.164442, 1)
+border_blend = true
+anti_aliasing = false
+
+[sub_resource type="LabelSettings" id="LabelSettings_gsdmr"]
+font_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_ik0oh"]
+font_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_mhu0e"]
+font_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_1kdeu"]
+font_size = 20
+
+[node name="Battle" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_43a11")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+metadata/_edit_lock_ = true
+
+[node name="BG" type="TextureRect" parent="UI"]
+z_index = -3
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_1a0q2")
+metadata/_edit_lock_ = true
+
+[node name="SelectAction" type="MarginContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -270.0
+offset_right = -820.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Panel" type="Panel" parent="UI/SelectAction"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_uxmv6")
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/SelectAction/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="ActionContainer" type="VBoxContainer" parent="UI/SelectAction/Panel/MarginContainer" groups=["ActionContainer"]]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="SkillsCont" type="Control" parent="UI/SelectAction/Panel/MarginContainer/ActionContainer"]
+custom_minimum_size = Vector2(132, 23)
+layout_mode = 2
+
+[node name="Skills" type="Label" parent="UI/SelectAction/Panel/MarginContainer/ActionContainer/SkillsCont"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Skills"
+label_settings = SubResource("LabelSettings_gsdmr")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PInfoCont" type="Control" parent="UI/SelectAction/Panel/MarginContainer/ActionContainer"]
+custom_minimum_size = Vector2(132, 23)
+layout_mode = 2
+
+[node name="PInfo" type="Label" parent="UI/SelectAction/Panel/MarginContainer/ActionContainer/PInfoCont"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Info"
+label_settings = SubResource("LabelSettings_ik0oh")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ItemsCont" type="Control" parent="UI/SelectAction/Panel/MarginContainer/ActionContainer"]
+custom_minimum_size = Vector2(132, 23)
+layout_mode = 2
+
+[node name="Items" type="Label" parent="UI/SelectAction/Panel/MarginContainer/ActionContainer/ItemsCont"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Items"
+label_settings = SubResource("LabelSettings_mhu0e")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SpecialCont" type="Control" parent="UI/SelectAction/Panel/MarginContainer/ActionContainer"]
+custom_minimum_size = Vector2(132, 23)
+layout_mode = 2
+
+[node name="Special" type="Label" parent="UI/SelectAction/Panel/MarginContainer/ActionContainer/SpecialCont"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Special"
+label_settings = SubResource("LabelSettings_1kdeu")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectStuff" type="MarginContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 140.0
+offset_top = -270.0
+offset_bottom = -135.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+
+[node name="Panel" type="Panel" parent="UI/SelectStuff"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_uxmv6")
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/SelectStuff/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+metadata/_edit_lock_ = true
+
+[node name="ItemList" type="GridContainer" parent="UI/SelectStuff/Panel/MarginContainer" groups=["ItemList"]]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 16
+columns = 4
+
+[node name="CharProfiles" type="HBoxContainer" parent="UI/SelectStuff/Panel/MarginContainer" groups=["CharProfiles"]]
+texture_filter = 2
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ArrowDown" type="Control" parent="UI/SelectStuff/Panel" groups=["MoreItemsArrow"]]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -812.0
+offset_top = -18.0
+offset_right = -772.0
+offset_bottom = 22.0
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(0.5, 0.5)
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="UI/SelectStuff/Panel/ArrowDown"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -16.0
+offset_right = -20.0
+offset_bottom = -2.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="ColorRect5" type="ColorRect" parent="UI/SelectStuff/Panel/ArrowDown"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -28.0
+offset_top = -2.0
+offset_right = -16.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="ColorRect3" type="ColorRect" parent="UI/SelectStuff/Panel/ArrowDown"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -26.0
+offset_top = -2.0
+offset_right = -18.0
+offset_bottom = 2.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="ColorRect4" type="ColorRect" parent="UI/SelectStuff/Panel/ArrowDown"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_right = -20.0
+offset_bottom = 4.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="ArrowUp" type="Control" parent="UI/SelectStuff/Panel" groups=["PrevItemsArrow"]]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -794.0
+offset_top = -109.0
+offset_right = -754.0
+offset_bottom = -69.0
+grow_horizontal = 0
+grow_vertical = 0
+rotation = 3.14159
+scale = Vector2(0.5, 0.5)
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="UI/SelectStuff/Panel/ArrowUp"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -16.0
+offset_right = -20.0
+offset_bottom = -2.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="ColorRect5" type="ColorRect" parent="UI/SelectStuff/Panel/ArrowUp"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -28.0
+offset_top = -2.0
+offset_right = -16.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="ColorRect3" type="ColorRect" parent="UI/SelectStuff/Panel/ArrowUp"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -26.0
+offset_top = -2.0
+offset_right = -18.0
+offset_bottom = 2.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="ColorRect4" type="ColorRect" parent="UI/SelectStuff/Panel/ArrowUp"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_right = -20.0
+offset_bottom = 4.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="Explanation" type="MarginContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 140.0
+offset_top = -135.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Panel" type="Panel" parent="UI/Explanation"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_uxmv6")
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/Explanation/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+metadata/_edit_lock_ = true
+
+[node name="Message" type="RichTextLabel" parent="UI/Explanation/Panel/MarginContainer" groups=["DownPanelMessage"]]
+layout_mode = 2
+bbcode_enabled = true
+
+[node name="Enemies" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+metadata/_edit_lock_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="Enemies"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 300
+metadata/_edit_lock_ = true
+
+[node name="EnemyList" type="HBoxContainer" parent="Enemies/MarginContainer" groups=["EnemyList"]]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+metadata/_edit_lock_ = true
+
+[node name="Cursor" parent="." instance=ExtResource("7_fwfnk")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+ParentPath = NodePath("../UI/SelectAction/Panel/MarginContainer/ActionContainer")
+
+[node name="Cursor2" parent="." instance=ExtResource("7_fwfnk")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+ParentPath = NodePath("../UI/SelectStuff/Panel/MarginContainer/ItemList")
+
+[node name="Cursor3" parent="." instance=ExtResource("7_fwfnk")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+ParentPath = NodePath("../UI/SelectStuff/Panel/MarginContainer/CharProfiles")
+
+[node name="Overlay" type="Control" parent="."]
+visible = false
+z_index = 3
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="ActionFeed" type="Control" parent="."]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 0.346
+offset_bottom = -0.12001
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_78axv")
+
+[node name="MarginContainer" type="MarginContainer" parent="ActionFeed"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ActionFeed/MarginContainer"]
+modulate = Color(1, 1, 1, 0.607843)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 5
+
+[node name="HandleFightEvents" type="Node" parent="."]
+script = ExtResource("5_11mp3")
