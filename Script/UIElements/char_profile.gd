@@ -24,3 +24,6 @@ func SetSelected(type:bool):
 
 func SetDead(IsDead):
 	$DeadOverlay.visible = IsDead
+
+func SelectCurrent(type:bool):
+	$CurSelected.visible = type

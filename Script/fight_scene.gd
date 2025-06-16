@@ -17,6 +17,9 @@ const ITEMS_PER_PAGE = 8
 
 @onready var ItemScene = load("res://Scenes/UIElements/item.tscn") 
 
+#Timers
+@onready var SkillUseTimer = get_node("Timers/SkillUseTimer")
+
 #Action -> Select Item -> EnemySelect
 var MenuLayer : int = 0 
 var UiDir : Vector2 = Vector2.ZERO
@@ -58,7 +61,7 @@ var StartMessage : String
 var BattleText = ""
 var BattleEnemies = []
 
-#ActionBuffer - [ID,type,target] - type   0:character 1:enemy
+#ActionBuffer - [ID,type,target] - type (who to attack)  0:character 1:enemy
 var ActionBuffer : Array
 
 #DownTextbox
@@ -74,7 +77,7 @@ func _enter_tree():
 	$Overlay.visible = true
 
 func _ready():
-	#what the fuck is wrong with control nodes, fuck this I will just wait I don't care
+	#don't touch this or everything breaks :)
 	await get_tree().create_timer(0.05).timeout
 	#
 	BattleStart([0,0],BattleText)
@@ -101,6 +104,7 @@ func GenProfiles():
 		CharPInst.SetName(CChar.Name)
 		CharPInst.SetHealth(CChar.PhysicalHealth,CChar.MentalHealth)
 		CharProfs.add_child(CharPInst)
+	UpdateProfiles()
 
 func BattleStart(Enemies : Array,Msg : String)->void:
 	var EnemyScene = load("res://Scenes/UIElements/enemy.tscn")
@@ -142,20 +146,20 @@ func UiMovement()->void:
 
 func UiLayerHandle()->void:
 	if Input.is_action_just_pressed("accept") and CheckAction():
+		
 		if MenuLayer < MenuTypes[SelIndexAction].size() and Cursor.size() > MenuLayer: 
 			AnimateCursor(true,MenuLayer)
 		if MenuTypes[SelIndexAction].size() == MenuLayer:
 			if !(SelIndexAction == SELECT_PROFILE):
-				ActionBuffer.append([TempItemList[SelIndexItem],0,SelIndexEnemy])
+				ActionBuffer.append([TempItemList[SelIndexItem],1,SelIndexEnemy])
 				
 				CharacterTurn += 1
-				while PartyInfo.MainParty[min(CharacterTurn,PartyInfo.MainParty.size()-1)].Dead == true and !PartyInfo.MainParty.size()-1 <= CharacterTurn:
+				while PartyInfo.MainParty[min(CharacterTurn,PartyInfo.MainParty.size()-1)].Dead == true and !PartyInfo.MainParty.size() <= CharacterTurn:
 					CharacterTurn += 1
 				ResetMenu()
 				if PartyInfo.MainParty.size() <= CharacterTurn:
 					CommitActions()
-					CharacterTurn = 0
-					ActionBuffer.resize(0)
+				UpdateProfiles()
 		else:
 			MenuLayer += 1
 		if MenuTypes[SelIndexAction][MenuLayer-1] == SELECT_ITEM:
@@ -196,7 +200,9 @@ func UpdateUi(Layer:int)->void:
 
 func UpdateProfiles():
 	for i in CharProfs.get_children().size():
-		CharProfs.get_child(i).SetHealth(PartyInfo.MainParty[i].PhysicalHealth,PartyInfo.MainParty[i].MentalHealth)
+		var CCharP = CharProfs.get_child(i)
+		CCharP.SelectCurrent(i==CharacterTurn)
+		CCharP.SetHealth(PartyInfo.MainParty[i].PhysicalHealth,PartyInfo.MainParty[i].MentalHealth)
 
 func ResetMenu():
 	MenuLayer = 0
@@ -294,8 +300,15 @@ func ResetCursor(Layer):
 ### ACTIONS ------------------------------------------------------------------------------------------------------
 
 func CommitActions():
+	HaltAction = true
 	GenEnemyActions()
 	for i in ActionBuffer.size():
+		if i >= ActionBuffer.size():
+			break
+		if AwaitInptToEnd:
+			break
+		SkillUseTimer.start(1.0)
+		await SkillUseTimer.timeout
 		if ActionBuffer[i][1] == 0:
 			match SelIndexAction:
 				ACTION_SKILL:
@@ -309,6 +322,10 @@ func CommitActions():
 		else:
 			SkillUse(ActionBuffer[i])
 	ResetMenu()
+	CharacterTurn = 0
+	UpdateProfiles()
+	ActionBuffer.resize(0)
+	HaltAction = false if !AwaitInptToEnd else true
 
 func GenEnemyActions():
 	FightParty.resize(0)
@@ -361,7 +378,6 @@ func SkillUse(SkillT):
 	var TargetArray = BattleEnemies if SkillT[1] == 1 else PartyInfo.MainParty
 	var TargetType = SkillT[2] 
 	var EnemyType = TargetArray[TargetType]
-	
 	match Effect:
 		Enums.TSkill.Damage:
 			if EnemyType is Character:
@@ -390,6 +406,7 @@ func SkillUse(SkillT):
 					EnemyDie(TargetType)
 				if BattleEnemies.size() == 0:
 					BattleEnd(1)
+					return
 
 func CheckPartyMembersDead()->bool:
 	var DeadAmnt = 0
@@ -403,6 +420,8 @@ func CheckPartyMembersDead()->bool:
 ### END STUFF ------------------------------------------------------------------------------------------------------
 
 func EnemyDie(Index):
+	if ActionBuffer.size() >= PartyInfo.MainParty.size() + BattleEnemies.size():
+		ActionBuffer.remove_at(PartyInfo.MainParty.size()+Index)
 	BattleEnemies.remove_at(Index)
 	EnemyList.get_child(Index).queue_free()
 

@@ -478,3 +478,8 @@ theme_override_constants/separation = 5
 
 [node name="HandleFightEvents" type="Node" parent="."]
 script = ExtResource("5_11mp3")
+
+[node name="Timers" type="Node" parent="."]
+
+[node name="SkillUseTimer" type="Timer" parent="Timers"]
+one_shot = true

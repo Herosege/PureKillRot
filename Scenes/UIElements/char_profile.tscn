@@ -40,6 +40,15 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.513726, 0, 0.0352941, 0.572549)
 
+[node name="CurSelected" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.49, 0.49, 0.49, 0.403922)
+
 [node name="Panel" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -48,15 +57,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_hovjx")
-
-[node name="CurSelected" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(1, 0.89, 0.89, 0.0666667)
 
 [node name="StatsPicture" type="HBoxContainer" parent="."]
 layout_mode = 0
