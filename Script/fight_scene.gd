@@ -15,11 +15,13 @@ const ITEMS_PER_PAGE = 8
 
 @onready var OverlayColor = get_node("Overlay/ColorRect")
 @onready var EnNameDis = get_node("UI/EnemyNameDisplay")
+@onready var AttTexture = get_node("AttackTexture")
 
 @onready var ItemScene = load("res://Scenes/UIElements/item.tscn") 
 
 #Timers
 @onready var SkillUseTimer = get_node("Timers/SkillUseTimer")
+@onready var TimePerSpites = get_node("Timers/TimePerSprite")
 
 #Action -> Select Item -> EnemySelect
 var MenuLayer : int = 0 
@@ -40,8 +42,6 @@ var MenuTypes = [
 var FightParty = []
 var CharacterTurn : int = 0
 var YourTurn = true
-
-var ProfilesArr = []
 
 #SelectAction
 var SelIndexAction : int = 0 
@@ -137,9 +137,9 @@ func UiMovement()->void:
 				SELECT_ITEM:
 					ItemsMenuHandle()
 				SELECT_PROFILE:
-					if ProfilesArr:
+					if CharProfs.get_children():
 						SelIndexProf += UiDir.x
-						SelIndexProf = clamp(SelIndexProf,0,ProfilesArr.size()-1)
+						SelIndexProf = clamp(SelIndexProf,0,CharProfs.get_children().size()-1)
 						UpdateUi(MenuLayer)
 				SELECT_CHARACTER:
 					if EnemyList.get_child_count() > 0:
@@ -293,70 +293,6 @@ func CheckAction()->bool:
 			return true if PartyInfo.MainParty[CharacterTurn].Special else false
 	return false
 
-### CURSOR ------------------------------------------------------------------------------------------------------
-
-func AnimateCursor(SetAnim:bool,Layer:int):
-	if Layer == 0:
-		Cursor[0].AnimateCursor(SetAnim)
-	if Layer > 0:
-		match SelIndexAction:
-			ACTION_SKILL:
-				Cursor[1].AnimateCursor(SetAnim)
-			ACTION_INFO:
-				Cursor[2].AnimateCursor(SetAnim)
-			ACTION_ITEM:
-				Cursor[1].AnimateCursor(SetAnim)
-			ACTION_SPECIAL:
-				Cursor[1].AnimateCursor(SetAnim)
-
-func ResetCursor(Layer):
-	Cursor[Layer].global_position = Vector2.ZERO
-	Cursor[Layer].size = Vector2.ZERO
-	Cursor[Layer].pivot_offset = Vector2.ZERO
-
-### ACTIONS ------------------------------------------------------------------------------------------------------
-
-func CommitActions():
-	HaltAction = true
-	GenEnemyActions()
-	for i in ActionBuffer.size():
-		if i >= ActionBuffer.size():
-			break
-		if AwaitInptToEnd:
-			break
-		if ActionBuffer[i] is not int:
-			SkillUseTimer.start(1.0)
-			await SkillUseTimer.timeout
-			if ActionBuffer[i][1] == 0:
-				match SelIndexAction:
-					ACTION_SKILL:
-						SkillUse(ActionBuffer[i])
-					ACTION_INFO:
-						pass
-					ACTION_ITEM:
-						pass
-					ACTION_SPECIAL:
-						pass
-			else:
-				SkillUse(ActionBuffer[i])
-	ResetMenu()
-	CharacterTurn = FightParty[0]
-	UpdateProfiles()
-	ActionBuffer.resize(PartyInfo.MainParty.size())
-	for i in ActionBuffer.size():
-		ActionBuffer[i] = -1
-	HaltAction = false if !AwaitInptToEnd else true
-
-func GenEnemyActions():
-	FightParty.resize(0)
-	for i in PartyInfo.MainParty.size():
-		if PartyInfo.MainParty[i].Dead == false:
-			FightParty.append(PartyInfo.MainParty.find(PartyInfo.MainParty[i]))
-	for i in BattleEnemies.size():
-		var TempBuf = BattleEnemies[i].RSkill(Turn,FightParty.size())
-		TempBuf[2] = FightParty[TempBuf[2]]
-		ActionBuffer.append(TempBuf)
-
 #-1 to Reset all layers
 func ResetMenuLayer(Layer):
 	if Layer > 0:
@@ -394,11 +330,81 @@ func ResetMenuLayer(Layer):
 			AnimSprite = EnemyList.get_child(i).get_child(0)
 			AnimSprite.material.set_shader_parameter("FlashOn",false)
 
-func SkillUse(SkillT):
+### CURSOR ------------------------------------------------------------------------------------------------------
+
+func AnimateCursor(SetAnim:bool,Layer:int):
+	if Layer == 0:
+		Cursor[0].AnimateCursor(SetAnim)
+	if Layer > 0:
+		match SelIndexAction:
+			ACTION_SKILL:
+				Cursor[1].AnimateCursor(SetAnim)
+			ACTION_INFO:
+				Cursor[2].AnimateCursor(SetAnim)
+			ACTION_ITEM:
+				Cursor[1].AnimateCursor(SetAnim)
+			ACTION_SPECIAL:
+				Cursor[1].AnimateCursor(SetAnim)
+
+func ResetCursor(Layer):
+	Cursor[Layer].global_position = Vector2.ZERO
+	Cursor[Layer].size = Vector2.ZERO
+	Cursor[Layer].pivot_offset = Vector2.ZERO
+
+### ACTIONS ------------------------------------------------------------------------------------------------------
+
+func CommitActions():
+	HaltAction = true
+	GenEnemyActions()
+	
+	for i in ActionBuffer.size():
+		if i >= ActionBuffer.size():
+			break
+		if AwaitInptToEnd:
+			break
+		if ActionBuffer[i] is not int:
+			var SkillT = ActionBuffer[i]
+			var TargetArray = BattleEnemies if SkillT[1] == 1 else PartyInfo.MainParty
+			var TargetType = SkillT[2] if SkillT[2] <= TargetArray.size()-1 else 0 
+			var STimes = SkillDB.GetSkill(SkillT[0]).AnimDuration
+			var Sprts = SkillDB.GetSkill(SkillT[0]).AnimSprites
+			var EnemNode
+			
+			if ActionBuffer[i][1] == 1:
+				EnemNode = EnemyList.get_child(TargetType)
+			else:
+				EnemNode = CharProfs.get_child(TargetType)
+			
+			SkillUseTimer.start(STimes*1.8)
+			
+			AttackTextureAnim(Sprts,STimes,EnemNode.global_position+EnemNode.size/2)
+			await SkillUseTimer.timeout
+			SkillUse(SkillT,TargetArray,TargetType)
+			SkillUseTimer.start(0.3)
+			await SkillUseTimer.timeout
+	
+	ResetMenu()
+	CharacterTurn = FightParty[0]
+	UpdateProfiles()
+	ActionBuffer.resize(PartyInfo.MainParty.size())
+	for i in ActionBuffer.size():
+		ActionBuffer[i] = -1
+	HaltAction = false if !AwaitInptToEnd else true
+
+func GenEnemyActions():
+	FightParty.resize(0)
+	for i in PartyInfo.MainParty.size():
+		if PartyInfo.MainParty[i].Dead == false:
+			FightParty.append(PartyInfo.MainParty.find(PartyInfo.MainParty[i]))
+	for i in BattleEnemies.size():
+		var TempBuf = BattleEnemies[i].RSkill(Turn,FightParty.size())
+		TempBuf[2] = FightParty[TempBuf[2]]
+		ActionBuffer.append(TempBuf)
+
+func SkillUse(SkillT,TargetArray,TargetType):
 	var Effect = SkillDB.GetSkill(SkillT[0]).Effect
 	var Vals = SkillDB.GetSkill(SkillT[0]).Values
-	var TargetArray = BattleEnemies if SkillT[1] == 1 else PartyInfo.MainParty
-	var TargetType = SkillT[2] if SkillT[2] <= TargetArray.size()-1 else 0 
+	
 	var EnemyType = TargetArray[TargetType]
 	match Effect:
 		Enums.TSkill.Damage:
@@ -438,6 +444,16 @@ func CheckPartyMembersDead()->bool:
 			if DeadAmnt >= PartyInfo.MainParty.size():
 				return true
 	return false
+
+func AttackTextureAnim(Sprites,SpriteTime,EnemNodePos):
+	var CalcTPS = (SpriteTime)/Sprites.size()
+	AttTexture.global_position = EnemNodePos
+	for i in Sprites:
+		AttTexture.texture = i
+		TimePerSpites.start(CalcTPS)
+		await TimePerSpites.timeout
+	
+	AttTexture.texture = null
 
 ### END STUFF ------------------------------------------------------------------------------------------------------
 
