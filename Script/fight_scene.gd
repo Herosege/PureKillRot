@@ -373,14 +373,19 @@ func CommitActions():
 			if ActionBuffer[i][1] == 1:
 				EnemNode = EnemyList.get_child(TargetType)
 			else:
-				EnemNode = CharProfs.get_child(TargetType)
+				EnemNode = CharProfs.get_child(TargetType).get_node("StatsPicture/TextureRect")
 			
-			SkillUseTimer.start(STimes*1.8)
+			SkillUseTimer.start(STimes*1.6)
 			
 			AttackTextureAnim(Sprts,STimes,EnemNode.global_position+EnemNode.size/2)
 			await SkillUseTimer.timeout
+			
+			DamagedFlashAnim(EnemNode)
+			SkillUseTimer.start(0.6)
+			await SkillUseTimer.timeout
+			
 			SkillUse(SkillT,TargetArray,TargetType)
-			SkillUseTimer.start(0.3)
+			SkillUseTimer.start(0.05)
 			await SkillUseTimer.timeout
 	
 	ResetMenu()
@@ -454,6 +459,12 @@ func AttackTextureAnim(Sprites,SpriteTime,EnemNodePos):
 		await TimePerSpites.timeout
 	
 	AttTexture.texture = null
+
+func DamagedFlashAnim(EnemNode):
+	for i in 8:
+		EnemNode.modulate.a = float(!bool(EnemNode.modulate.a))
+		TimePerSpites.start(0.06)
+		await TimePerSpites.timeout
 
 ### END STUFF ------------------------------------------------------------------------------------------------------
 
