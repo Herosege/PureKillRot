@@ -14,6 +14,7 @@ const ITEMS_PER_PAGE = 8
 @onready var Cursor = get_tree().get_nodes_in_group("Cursor")
 
 @onready var OverlayColor = get_node("Overlay/ColorRect")
+@onready var EnNameDis = get_node("UI/EnemyNameDisplay")
 
 @onready var ItemScene = load("res://Scenes/UIElements/item.tscn") 
 
@@ -77,6 +78,8 @@ func _enter_tree():
 	$Overlay.visible = true
 
 func _ready():
+	for i in PartyInfo.MainParty.size():
+		ActionBuffer.append(-1)
 	#don't touch this or everything breaks :)
 	await get_tree().create_timer(0.05).timeout
 	#
@@ -151,7 +154,7 @@ func UiLayerHandle()->void:
 			AnimateCursor(true,MenuLayer)
 		if MenuTypes[SelIndexAction].size() == MenuLayer:
 			if !(SelIndexAction == SELECT_PROFILE):
-				ActionBuffer.append([TempItemList[SelIndexItem],1,SelIndexEnemy])
+				ActionBuffer[CharacterTurn] = [TempItemList[SelIndexItem],1,SelIndexEnemy]
 				
 				CharacterTurn += 1
 				while PartyInfo.MainParty[min(CharacterTurn,PartyInfo.MainParty.size()-1)].Dead == true and !PartyInfo.MainParty.size() <= CharacterTurn:
@@ -170,6 +173,17 @@ func UiLayerHandle()->void:
 			CharProfs.visible = true
 	
 	if Input.is_action_just_pressed("back"):
+		if MenuLayer == 0 and CharacterTurn > 0:
+			var GoBackAmnt = CharacterTurn - 1
+			while PartyInfo.MainParty[GoBackAmnt].Dead == true and GoBackAmnt > 0:
+				GoBackAmnt -= 1
+			if GoBackAmnt == 0 and PartyInfo.MainParty[GoBackAmnt].Dead == true:
+				return
+			CharacterTurn = GoBackAmnt
+			#print("Pre:   ",ActionBuffer)
+			ActionBuffer.set(CharacterTurn,-1)
+			#print("Post:   ",ActionBuffer)
+			UpdateProfiles()
 		if MenuLayer > 0 and Cursor.size() > MenuLayer-1: 
 			AnimateCursor(false,MenuLayer-1)
 		
@@ -192,6 +206,9 @@ func UpdateUi(Layer:int)->void:
 				Cursor[2].SetCursorFromIndex(SelIndexProf)
 			SELECT_CHARACTER:
 				var AnimSprite
+				EnNameDis.visible = true
+				var SetName =  str(BattleEnemies[SelIndexEnemy].Name) + " " + str(SelIndexEnemy+1) if BattleEnemies.size() > 1 else str(BattleEnemies[SelIndexEnemy].Name)
+				EnNameDis.get_node("TextMargin/Label").text = SetName
 				for i in EnemyList.get_children().size():
 					AnimSprite = EnemyList.get_child(i).get_child(0)
 					AnimSprite.material.set_shader_parameter("FlashOn",false)
@@ -307,24 +324,27 @@ func CommitActions():
 			break
 		if AwaitInptToEnd:
 			break
-		SkillUseTimer.start(1.0)
-		await SkillUseTimer.timeout
-		if ActionBuffer[i][1] == 0:
-			match SelIndexAction:
-				ACTION_SKILL:
-					SkillUse(ActionBuffer[i])
-				ACTION_INFO:
-					pass
-				ACTION_ITEM:
-					pass
-				ACTION_SPECIAL:
-					pass
-		else:
-			SkillUse(ActionBuffer[i])
+		if ActionBuffer[i] is not int:
+			SkillUseTimer.start(1.0)
+			await SkillUseTimer.timeout
+			if ActionBuffer[i][1] == 0:
+				match SelIndexAction:
+					ACTION_SKILL:
+						SkillUse(ActionBuffer[i])
+					ACTION_INFO:
+						pass
+					ACTION_ITEM:
+						pass
+					ACTION_SPECIAL:
+						pass
+			else:
+				SkillUse(ActionBuffer[i])
 	ResetMenu()
-	CharacterTurn = 0
+	CharacterTurn = FightParty[0]
 	UpdateProfiles()
-	ActionBuffer.resize(0)
+	ActionBuffer.resize(PartyInfo.MainParty.size())
+	for i in ActionBuffer.size():
+		ActionBuffer[i] = -1
 	HaltAction = false if !AwaitInptToEnd else true
 
 func GenEnemyActions():
@@ -352,6 +372,7 @@ func ResetMenuLayer(Layer):
 				ResetCursor(2)
 			SELECT_CHARACTER:
 				var AnimSprite
+				EnNameDis.visible = false
 				for i in EnemyList.get_children().size():
 					AnimSprite = EnemyList.get_child(i).get_child(0)
 					AnimSprite.material.set_shader_parameter("FlashOn",false)
@@ -368,6 +389,7 @@ func ResetMenuLayer(Layer):
 		ResetCursor(2)
 		#
 		var AnimSprite
+		EnNameDis.visible = false
 		for i in EnemyList.get_children().size():
 			AnimSprite = EnemyList.get_child(i).get_child(0)
 			AnimSprite.material.set_shader_parameter("FlashOn",false)
@@ -376,7 +398,7 @@ func SkillUse(SkillT):
 	var Effect = SkillDB.GetSkill(SkillT[0]).Effect
 	var Vals = SkillDB.GetSkill(SkillT[0]).Values
 	var TargetArray = BattleEnemies if SkillT[1] == 1 else PartyInfo.MainParty
-	var TargetType = SkillT[2] 
+	var TargetType = SkillT[2] if SkillT[2] <= TargetArray.size()-1 else 0 
 	var EnemyType = TargetArray[TargetType]
 	match Effect:
 		Enums.TSkill.Damage:
@@ -399,7 +421,7 @@ func SkillUse(SkillT):
 					return
 			else:
 				EnemyType.TakeDamage(Vals[0])
-				var EnemName = str(EnemyType.Name) if TargetArray.size() <= 1 else str(EnemyType.Name) + "_" + str(TargetType+1)
+				var EnemName = str(EnemyType.Name) if TargetArray.size() <= 1 else str(EnemyType.Name) + " " + str(TargetType+1)
 				SignalBus.emit_signal("AnnounceAction",EnemName + " took " + str(Vals[0]) + " Damage!")
 				if EnemyType.Health <= 0:
 					SignalBus.emit_signal("AnnounceAction",EnemName + " died")
@@ -424,6 +446,7 @@ func EnemyDie(Index):
 		ActionBuffer.remove_at(PartyInfo.MainParty.size()+Index)
 	BattleEnemies.remove_at(Index)
 	EnemyList.get_child(Index).queue_free()
+	SelIndexEnemy = 0
 
 func CharacterDie(Index):
 	FightParty.remove_at(FightParty.find(Index))
