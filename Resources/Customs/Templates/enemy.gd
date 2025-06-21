@@ -4,18 +4,18 @@ class_name Enemy
 var Name : String
 var Sprites : Array
 
-var Health : float
+var PhysicalHealth : float
 var Skills : Array
 
 var AI
 
 func TakeDamage(Amnt):
-	Health -= Amnt
+	PhysicalHealth -= Amnt
 
 func _init(a,b,c,d,e):
 	Name = a
 	Sprites = b
-	Health = c
+	PhysicalHealth = c
 	Skills = d
 	AI = e
 

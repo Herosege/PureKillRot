@@ -10,7 +10,7 @@ func GetEnemyNew(ID:int)->Enemy:
 	var Abba = Enemy.new(
 		Base.Name,
 		Base.Sprites,
-		Base.Health,
+		Base.PhysicalHealth,
 		Base.Skills,
 		Base.AI
 		)

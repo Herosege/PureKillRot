@@ -63,6 +63,7 @@ var BattleText = ""
 var BattleEnemies = []
 
 #ActionBuffer - [ID,type,target] - type (who to attack)  0:character 1:enemy
+enum IsAttacked {character,enemy} 
 var ActionBuffer : Array
 
 #DownTextbox
@@ -364,10 +365,12 @@ func CommitActions():
 			break
 		if ActionBuffer[i] is not int:
 			var SkillT = ActionBuffer[i]
-			var TargetArray = BattleEnemies if SkillT[1] == 1 else PartyInfo.MainParty
+			var CharaType = SkillT[1] 
+			var TargetArray = BattleEnemies if CharaType == 1 else PartyInfo.MainParty
 			var TargetType = SkillT[2] if SkillT[2] <= TargetArray.size()-1 else 0 
 			var STimes = SkillDB.GetSkill(SkillT[0]).AnimDuration
 			var Sprts = SkillDB.GetSkill(SkillT[0]).AnimSprites
+			var EnemyType = TargetArray[TargetType]
 			var EnemNode
 			
 			if ActionBuffer[i][1] == 1:
@@ -378,13 +381,16 @@ func CommitActions():
 			SkillUseTimer.start(STimes*1.6)
 			
 			AttackTextureAnim(Sprts,STimes,EnemNode.global_position+EnemNode.size/2)
-			await SkillUseTimer.timeout
 			
+			await SkillUseTimer.timeout
+			SkillUse(SkillT,TargetArray,TargetType,EnemyType)
 			DamagedFlashAnim(EnemNode)
+			
 			SkillUseTimer.start(0.6)
 			await SkillUseTimer.timeout
 			
-			SkillUse(SkillT,TargetArray,TargetType)
+			CheckDeadUpdate(TargetArray,TargetType,EnemyType,CharaType)
+			
 			SkillUseTimer.start(0.05)
 			await SkillUseTimer.timeout
 	
@@ -406,11 +412,10 @@ func GenEnemyActions():
 		TempBuf[2] = FightParty[TempBuf[2]]
 		ActionBuffer.append(TempBuf)
 
-func SkillUse(SkillT,TargetArray,TargetType):
+func SkillUse(SkillT,TargetArray,TargetType,EnemyType):
 	var Effect = SkillDB.GetSkill(SkillT[0]).Effect
 	var Vals = SkillDB.GetSkill(SkillT[0]).Values
 	
-	var EnemyType = TargetArray[TargetType]
 	match Effect:
 		Enums.TSkill.Damage:
 			if EnemyType is Character:
@@ -423,20 +428,14 @@ func SkillUse(SkillT,TargetArray,TargetType):
 				EnemyType.TakeDamage(Vals[0])
 				var EnemName = str(EnemyType.Name)
 				SignalBus.emit_signal("AnnounceAction",EnemName + " took " + str(Vals[0]) + " Damage!")
-				if EnemyType.PhysicalHealth <= 0:
-					SignalBus.emit_signal("AnnounceAction",EnemName + " died")
-					CharacterDie(TargetType)
-					UpdateProfiles()
+				UpdateProfiles()
 				if CheckPartyMembersDead():
 					BattleEnd(0)
 					return
 			else:
-				EnemyType.TakeDamage(Vals[0])
+				EnemyType.TakeDamage(Vals[0])###tutaj zoptymalizować
 				var EnemName = str(EnemyType.Name) if TargetArray.size() <= 1 else str(EnemyType.Name) + " " + str(TargetType+1)
 				SignalBus.emit_signal("AnnounceAction",EnemName + " took " + str(Vals[0]) + " Damage!")
-				if EnemyType.Health <= 0:
-					SignalBus.emit_signal("AnnounceAction",EnemName + " died")
-					EnemyDie(TargetType)
 				if BattleEnemies.size() == 0:
 					BattleEnd(1)
 					return
@@ -449,6 +448,25 @@ func CheckPartyMembersDead()->bool:
 			if DeadAmnt >= PartyInfo.MainParty.size():
 				return true
 	return false
+
+func CheckDeadUpdate(TargetArray,TargetType,EnemyType,CharaType):
+	var HasDupes = false
+	var TempDup = []
+	for i in TargetArray:
+		if !TempDup.has(i.Name):
+			TempDup.append(i.Name)
+		else:
+			HasDupes = true
+			break
+		
+	var EnemName = str(EnemyType.Name) if !HasDupes else str(EnemyType.Name) + " " + str(TargetType+1)
+	if EnemyType.PhysicalHealth <= 0:
+		
+		SignalBus.emit_signal("AnnounceAction",EnemName + " died")
+		CharacterDie(TargetType,CharaType)
+		UpdateProfiles()
+
+### SKILL ANIMS ------------------------------------------------------------------------------------
 
 func AttackTextureAnim(Sprites,SpriteTime,EnemNodePos):
 	var CalcTPS = (SpriteTime)/Sprites.size()
@@ -467,18 +485,25 @@ func DamagedFlashAnim(EnemNode):
 		await TimePerSpites.timeout
 
 ### END STUFF ------------------------------------------------------------------------------------------------------
-
-func EnemyDie(Index):
-	if ActionBuffer.size() >= PartyInfo.MainParty.size() + BattleEnemies.size():
-		ActionBuffer.remove_at(PartyInfo.MainParty.size()+Index)
-	BattleEnemies.remove_at(Index)
-	EnemyList.get_child(Index).queue_free()
-	SelIndexEnemy = 0
-
-func CharacterDie(Index):
-	FightParty.remove_at(FightParty.find(Index))
-	PartyInfo.MainParty[Index].Dead = true
-	CharProfs.get_child(Index).SetDead(true)
+#0-character 1-enemy
+func CharacterDie(Index,Type):
+	match Type:
+		IsAttacked.character:
+			FightParty.remove_at(FightParty.find(Index))
+			PartyInfo.MainParty[Index].Dead = true
+			CharProfs.get_child(Index).SetDead(true)
+			if CheckPartyMembersDead():
+				BattleEnd(0)
+				return
+		IsAttacked.enemy:
+			if ActionBuffer.size() >= PartyInfo.MainParty.size() + BattleEnemies.size():
+				ActionBuffer.remove_at(PartyInfo.MainParty.size()+Index)
+			BattleEnemies.remove_at(Index)
+			EnemyList.get_child(Index).queue_free()
+			SelIndexEnemy = 0
+			if BattleEnemies.size() == 0:
+				BattleEnd(1)
+				return
 
 #0-lose   1-win
 func BattleEnd(type):
