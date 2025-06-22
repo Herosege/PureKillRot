@@ -40,7 +40,7 @@ var MenuTypes = [
 	]
 
 var FightParty = []
-var CharacterTurn : int = 0
+var CharacterTurn : int = -1
 var YourTurn = true
 
 #SelectAction
@@ -79,6 +79,12 @@ func _enter_tree():
 	$Overlay.visible = true
 
 func _ready():
+	#Engine.time_scale = 2.0
+	for i in PartyInfo.MainParty.size():
+		if PartyInfo.MainParty[i].Dead == false:
+			FightParty.append(PartyInfo.MainParty.find(PartyInfo.MainParty[i]))
+			if CharacterTurn == -1:
+				CharacterTurn = i
 	for i in PartyInfo.MainParty.size():
 		ActionBuffer.append(-1)
 	#don't touch this or everything breaks :)
@@ -87,6 +93,7 @@ func _ready():
 	BattleStart([0,0],BattleText)
 	UpdateUi(0)
 	GenProfiles()
+	UpdateProfiles()
 
 func _process(delta):
 	if AwaitInptToEnd and Input.is_action_just_pressed("accept"):
@@ -108,7 +115,6 @@ func GenProfiles():
 		CharPInst.SetName(CChar.Name)
 		CharPInst.SetHealth(CChar.PhysicalHealth,CChar.MentalHealth)
 		CharProfs.add_child(CharPInst)
-	UpdateProfiles()
 
 func BattleStart(Enemies : Array,Msg : String)->void:
 	var EnemyScene = load("res://Scenes/UIElements/enemy.tscn")
@@ -221,6 +227,8 @@ func UpdateProfiles():
 		var CCharP = CharProfs.get_child(i)
 		CCharP.SelectCurrent(i==CharacterTurn)
 		CCharP.SetHealth(PartyInfo.MainParty[i].PhysicalHealth,PartyInfo.MainParty[i].MentalHealth)
+		if PartyInfo.MainParty[i].Dead == true:
+			CCharP.SetDead(true)
 
 func ResetMenu():
 	MenuLayer = 0
@@ -390,12 +398,13 @@ func CommitActions():
 			await SkillUseTimer.timeout
 			
 			CheckDeadUpdate(TargetArray,TargetType,EnemyType,CharaType)
-			
+			if CheckEndFight():
+				return
 			SkillUseTimer.start(0.05)
 			await SkillUseTimer.timeout
-	
 	ResetMenu()
-	CharacterTurn = FightParty[0]
+	if FightParty:
+		CharacterTurn = FightParty[0]
 	UpdateProfiles()
 	ActionBuffer.resize(PartyInfo.MainParty.size())
 	for i in ActionBuffer.size():
@@ -418,35 +427,31 @@ func SkillUse(SkillT,TargetArray,TargetType,EnemyType):
 	
 	match Effect:
 		Enums.TSkill.Damage:
-			if EnemyType is Character:
-				if FightParty.size() <= 0:
-					BattleEnd(0)
-					return
+			CheckEndFight()
+			if SkillT[1] == IsAttacked.character:
 				if EnemyType.Dead == true:
 					TargetType = FightParty[randi()%FightParty.size()]
 					EnemyType = TargetArray[TargetType]
-				EnemyType.TakeDamage(Vals[0])
-				var EnemName = str(EnemyType.Name)
-				SignalBus.emit_signal("AnnounceAction",EnemName + " took " + str(Vals[0]) + " Damage!")
-				UpdateProfiles()
-				if CheckPartyMembersDead():
-					BattleEnd(0)
-					return
-			else:
-				EnemyType.TakeDamage(Vals[0])###tutaj zoptymalizować
-				var EnemName = str(EnemyType.Name) if TargetArray.size() <= 1 else str(EnemyType.Name) + " " + str(TargetType+1)
-				SignalBus.emit_signal("AnnounceAction",EnemName + " took " + str(Vals[0]) + " Damage!")
-				if BattleEnemies.size() == 0:
-					BattleEnd(1)
-					return
+			EnemyType.TakeDamage(Vals[0])
+			var HasDupes = false
+			var TempDup = []
+			for i in TargetArray:
+				if !TempDup.has(i.Name):
+					TempDup.append(i.Name)
+				else:
+					HasDupes = true
+					break
+			var EnemName = str(EnemyType.Name) if !HasDupes else str(EnemyType.Name) + " " + str(TargetType+1)
+			SignalBus.emit_signal("AnnounceAction",EnemName + " took " + str(Vals[0]) + " Damage!")
+			UpdateProfiles()
 
-func CheckPartyMembersDead()->bool:
-	var DeadAmnt = 0
-	for i in PartyInfo.MainParty.size():
-		if PartyInfo.MainParty[i].Dead == true:
-			DeadAmnt+=1
-			if DeadAmnt >= PartyInfo.MainParty.size():
-				return true
+func CheckEndFight()->bool:
+	if BattleEnemies.size() == 0:
+		BattleEnd(1)
+		return true
+	if FightParty.size() == 0:
+		BattleEnd(0)
+		return true
 	return false
 
 func CheckDeadUpdate(TargetArray,TargetType,EnemyType,CharaType):
@@ -492,18 +497,13 @@ func CharacterDie(Index,Type):
 			FightParty.remove_at(FightParty.find(Index))
 			PartyInfo.MainParty[Index].Dead = true
 			CharProfs.get_child(Index).SetDead(true)
-			if CheckPartyMembersDead():
-				BattleEnd(0)
-				return
 		IsAttacked.enemy:
 			if ActionBuffer.size() >= PartyInfo.MainParty.size() + BattleEnemies.size():
 				ActionBuffer.remove_at(PartyInfo.MainParty.size()+Index)
 			BattleEnemies.remove_at(Index)
 			EnemyList.get_child(Index).queue_free()
 			SelIndexEnemy = 0
-			if BattleEnemies.size() == 0:
-				BattleEnd(1)
-				return
+	CheckEndFight()
 
 #0-lose   1-win
 func BattleEnd(type):
