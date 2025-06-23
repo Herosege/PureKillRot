@@ -22,6 +22,7 @@ const ITEMS_PER_PAGE = 8
 #Timers
 @onready var SkillUseTimer = get_node("Timers/SkillUseTimer")
 @onready var TimePerSpites = get_node("Timers/TimePerSprite")
+@onready var LabelAnim = get_node("Timers/LabelAnim")
 
 #Action -> Select Item -> EnemySelect
 var MenuLayer : int = 0 
@@ -442,8 +443,9 @@ func SkillUse(SkillT,TargetArray,TargetType,EnemyType):
 					HasDupes = true
 					break
 			var EnemName = str(EnemyType.Name) if !HasDupes else str(EnemyType.Name) + " " + str(TargetType+1)
-			SignalBus.emit_signal("AnnounceAction",EnemName + " took " + str(Vals[0]) + " Damage!")
+			SignalBus.emit_signal("AnnounceAction", EnemName + " took " + str(Vals[0]) + " Damage!")
 			UpdateProfiles()
+			DamageNumberAnim(Vals[0])
 
 func CheckEndFight()->bool:
 	if BattleEnemies.size() == 0:
@@ -488,6 +490,10 @@ func DamagedFlashAnim(EnemNode):
 		EnemNode.modulate.a = float(!bool(EnemNode.modulate.a))
 		TimePerSpites.start(0.06)
 		await TimePerSpites.timeout
+
+func DamageNumberAnim(DamageNum):
+	var LabelsPos = AttTexture.global_position + Vector2(0,20.0)
+	SignalBus.emit_signal("AnnounceDamage",-DamageNum,LabelsPos)
 
 ### END STUFF ------------------------------------------------------------------------------------------------------
 #0-character 1-enemy

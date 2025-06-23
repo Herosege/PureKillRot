@@ -1,6 +1,6 @@
 extends Control
 
-const MAX_CHILDREN = 6
+const MAX_CHILDREN = 8
 
 @onready var AFCont = get_node("MarginContainer/VBoxContainer")
 var AFLScene = load("res://Scenes/UIElements/action_feed_label.tscn")
@@ -13,7 +13,7 @@ func _ready():
 		#AddLabel(randf())
 
 func AddLabel(Info):
-	if AFCont.get_child_count() > MAX_CHILDREN:
+	if AFCont.get_child_count() >= MAX_CHILDREN:
 		for i in (AFCont.get_child_count()-MAX_CHILDREN):
 			AFCont.get_child(0+i).queue_free()
 	var AFLInst = AFLScene.instantiate()

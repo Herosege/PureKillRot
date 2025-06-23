@@ -9,8 +9,10 @@ signal EventConclude
 
 signal ChangeScene(To)
 
+#fightscene
 signal PassSkill
 signal AnnounceAction(Text)
+signal AnnounceDamage(Text,Pos)
 
 signal EndBattle(type)
 
