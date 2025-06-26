@@ -374,31 +374,49 @@ func CommitActions():
 			break
 		if ActionBuffer[i] is not int:
 			var SkillT = ActionBuffer[i]
-			var CharaType = SkillT[1] 
-			var TargetArray = BattleEnemies if CharaType == 1 else PartyInfo.MainParty
+			var CharaType = SkillT[1]
+			
+			var AttackerArray = BattleEnemies if CharaType == IsAttacked.character else PartyInfo.MainParty
+			var TargetArray = BattleEnemies if CharaType == IsAttacked.enemy else PartyInfo.MainParty
+			
 			var TargetType = SkillT[2] if SkillT[2] <= TargetArray.size()-1 else 0 
+			
+			var AttackerType = AttackerArray[i] if CharaType == IsAttacked.enemy else AttackerArray[i-PartyInfo.MainParty.size()]
+			var EnemyType = TargetArray[TargetType]
+			
+			var Dupes = CheckDupes(AttackerArray)
+			var AttackerName = AttackerType.Name if !Dupes else str(AttackerType.Name) + " " + str(Dupes)
+			
+			Dupes = CheckDupes(TargetArray)
+			var AttackedName = EnemyType.Name if !Dupes else str(EnemyType.Name) + " " + str(Dupes)
+			
 			var STimes = SkillDB.GetSkill(SkillT[0]).AnimDuration
 			var Sprts = SkillDB.GetSkill(SkillT[0]).AnimSprites
-			var EnemyType = TargetArray[TargetType]
+			
+			
 			var EnemNode
+			
 			
 			if ActionBuffer[i][1] == 1:
 				EnemNode = EnemyList.get_child(TargetType)
+				
 			else:
 				EnemNode = CharProfs.get_child(TargetType).get_node("StatsPicture/TextureRect")
+				EnemyList.get_child(TargetType).PlayFlashAnim() #### CZASAMI SIĘ CRASHUJE - NAPRAW
+				
+				SignalBus.emit_signal("AnnounceAction",AttackerName + " attacks " + AttackedName)
 			
 			SkillUseTimer.start(STimes*1.6)
-			
 			AttackTextureAnim(Sprts,STimes,EnemNode.global_position+EnemNode.size/2)
 			
 			await SkillUseTimer.timeout
-			SkillUse(SkillT,TargetArray,TargetType,EnemyType)
+			SkillUse(SkillT,TargetArray,TargetType,EnemyType,AttackedName)
 			DamagedFlashAnim(EnemNode)
 			
 			SkillUseTimer.start(0.6)
 			await SkillUseTimer.timeout
 			
-			CheckDeadUpdate(TargetArray,TargetType,EnemyType,CharaType)
+			CheckDeadUpdate(TargetArray,TargetType,EnemyType,CharaType,AttackedName)
 			if CheckEndFight():
 				return
 			SkillUseTimer.start(0.05)
@@ -422,7 +440,7 @@ func GenEnemyActions():
 		TempBuf[2] = FightParty[TempBuf[2]]
 		ActionBuffer.append(TempBuf)
 
-func SkillUse(SkillT,TargetArray,TargetType,EnemyType):
+func SkillUse(SkillT,TargetArray,TargetType,EnemyType,AttackedName):
 	var Effect = SkillDB.GetSkill(SkillT[0]).Effect
 	var Vals = SkillDB.GetSkill(SkillT[0]).Values
 	
@@ -434,16 +452,7 @@ func SkillUse(SkillT,TargetArray,TargetType,EnemyType):
 					TargetType = FightParty[randi()%FightParty.size()]
 					EnemyType = TargetArray[TargetType]
 			EnemyType.TakeDamage(Vals[0])
-			var HasDupes = false
-			var TempDup = []
-			for i in TargetArray:
-				if !TempDup.has(i.Name):
-					TempDup.append(i.Name)
-				else:
-					HasDupes = true
-					break
-			var EnemName = str(EnemyType.Name) if !HasDupes else str(EnemyType.Name) + " " + str(TargetType+1)
-			SignalBus.emit_signal("AnnounceAction", EnemName + " took " + str(Vals[0]) + " Damage!")
+			SignalBus.emit_signal("AnnounceAction", AttackedName + " took " + str(Vals[0]) + " Damage!")
 			UpdateProfiles()
 			DamageNumberAnim(Vals[0])
 
@@ -456,22 +465,22 @@ func CheckEndFight()->bool:
 		return true
 	return false
 
-func CheckDeadUpdate(TargetArray,TargetType,EnemyType,CharaType):
-	var HasDupes = false
+func CheckDeadUpdate(TargetArray,TargetType,EnemyType,CharaType,AttackedName):
+	if EnemyType.PhysicalHealth <= 0:
+		
+		SignalBus.emit_signal("AnnounceAction",AttackedName + " died")
+		CharacterDie(TargetType,CharaType)
+		UpdateProfiles()
+
+func CheckDupes(TargetArray)->int:
 	var TempDup = []
+	var DupAmnt = 0
 	for i in TargetArray:
 		if !TempDup.has(i.Name):
 			TempDup.append(i.Name)
 		else:
-			HasDupes = true
-			break
-		
-	var EnemName = str(EnemyType.Name) if !HasDupes else str(EnemyType.Name) + " " + str(TargetType+1)
-	if EnemyType.PhysicalHealth <= 0:
-		
-		SignalBus.emit_signal("AnnounceAction",EnemName + " died")
-		CharacterDie(TargetType,CharaType)
-		UpdateProfiles()
+			DupAmnt += 1
+	return DupAmnt
 
 ### SKILL ANIMS ------------------------------------------------------------------------------------
 
@@ -494,6 +503,7 @@ func DamagedFlashAnim(EnemNode):
 func DamageNumberAnim(DamageNum):
 	var LabelsPos = AttTexture.global_position + Vector2(0,20.0)
 	SignalBus.emit_signal("AnnounceDamage",-DamageNum,LabelsPos)
+
 
 ### END STUFF ------------------------------------------------------------------------------------------------------
 #0-character 1-enemy
