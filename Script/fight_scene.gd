@@ -379,16 +379,17 @@ func CommitActions():
 			var AttackerArray = BattleEnemies if CharaType == IsAttacked.character else PartyInfo.MainParty
 			var TargetArray = BattleEnemies if CharaType == IsAttacked.enemy else PartyInfo.MainParty
 			
+			var AttackerIndex = i if CharaType == IsAttacked.enemy else i-PartyInfo.MainParty.size()
 			var TargetType = SkillT[2] if SkillT[2] <= TargetArray.size()-1 else 0 
 			
-			var AttackerType = AttackerArray[i] if CharaType == IsAttacked.enemy else AttackerArray[i-PartyInfo.MainParty.size()]
+			var AttackerType = AttackerArray[AttackerIndex]
 			var EnemyType = TargetArray[TargetType]
 			
 			var Dupes = CheckDupes(AttackerArray)
 			var AttackerName = AttackerType.Name if !Dupes else str(AttackerType.Name) + " " + str(Dupes)
 			
 			Dupes = CheckDupes(TargetArray)
-			var AttackedName = EnemyType.Name if !Dupes else str(EnemyType.Name) + " " + str(Dupes)
+			var AttackedName = EnemyType.Name if !Dupes else str(EnemyType.Name) + " " + str(Dupes+TargetType)
 			
 			var STimes = SkillDB.GetSkill(SkillT[0]).AnimDuration
 			var Sprts = SkillDB.GetSkill(SkillT[0]).AnimSprites
@@ -402,9 +403,9 @@ func CommitActions():
 				
 			else:
 				EnemNode = CharProfs.get_child(TargetType).get_node("StatsPicture/TextureRect")
-				EnemyList.get_child(TargetType).PlayFlashAnim() #### CZASAMI SIĘ CRASHUJE - NAPRAW
+				EnemyList.get_child(AttackerIndex).PlayFlashAnim()
 				
-				SignalBus.emit_signal("AnnounceAction",AttackerName + " attacks " + AttackedName)
+			SignalBus.emit_signal("AnnounceAction",AttackerName + " attacks " + AttackedName)
 			
 			SkillUseTimer.start(STimes*1.6)
 			AttackTextureAnim(Sprts,STimes,EnemNode.global_position+EnemNode.size/2)
