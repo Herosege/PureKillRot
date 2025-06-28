@@ -27,3 +27,6 @@ func SetDead(IsDead):
 
 func SelectCurrent(type:bool):
 	$CurSelected.visible = type
+
+func PlayFlashAnim():
+	$AnimationPlayer.play("flash")

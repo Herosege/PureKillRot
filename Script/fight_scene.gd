@@ -400,7 +400,7 @@ func CommitActions():
 			
 			if ActionBuffer[i][1] == 1:
 				EnemNode = EnemyList.get_child(TargetType)
-				
+				CharProfs.get_child(AttackerIndex).PlayFlashAnim()
 			else:
 				EnemNode = CharProfs.get_child(TargetType).get_node("StatsPicture/TextureRect")
 				EnemyList.get_child(AttackerIndex).PlayFlashAnim()

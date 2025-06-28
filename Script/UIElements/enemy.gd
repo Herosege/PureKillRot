@@ -10,3 +10,6 @@ func _ready():
 
 func PlayFlashAnim():
 	$AnimationPlayer.play("ShortFlash")
+
+func PlayDamagedAnim():
+	$AnimationPlayer.play("DamagedFlash")
