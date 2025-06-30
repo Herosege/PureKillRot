@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://e55yhkovq1g7"]
+[gd_scene load_steps=8 format=3 uid="uid://e55yhkovq1g7"]
 
 [ext_resource type="Script" uid="uid://dykt2u38tm08n" path="res://Script/menu.gd" id="1_qd5w8"]
 [ext_resource type="Texture2D" uid="uid://bls8cn6je3t52" path="res://Assets/Textures/Sprites_battle/Icons/Othenson.png" id="1_unlas"]
+[ext_resource type="Shader" uid="uid://bxaygjvv1hcr1" path="res://Resources/Shaders/char_profile_border.gdshader" id="2_cayip"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alioa"]
 bg_color = Color(0, 0, 0, 0.470588)
@@ -10,8 +11,19 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_158mb"]
+resource_local_to_scene = true
+shader = ExtResource("2_cayip")
+shader_parameter/line_color = Color(1, 1, 1, 1)
+shader_parameter/line_thickness = 1.0
+shader_parameter/FlashOn = false
+shader_parameter/FlashAmnt = 0.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_cayip"]
+font_size = 20
+
 [sub_resource type="LabelSettings" id="LabelSettings_vtf3y"]
-font_size = 10
+font_size = 14
 
 [node name="Menu" type="Control"]
 process_mode = 3
@@ -77,16 +89,16 @@ vertical_alignment = 1
 layout_mode = 2
 theme_override_constants/margin_left = 200
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MarginContainer"]
+[node name="ProfilesContainer" type="VBoxContainer" parent="MarginContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="CharacterSlot" type="Panel" parent="MarginContainer/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 100)
+[node name="CharacterSlot" type="Panel" parent="MarginContainer/MarginContainer/ProfilesContainer"]
+custom_minimum_size = Vector2(0, 110)
 layout_direction = 2
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_alioa")
 
-[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot"]
+[node name="MC" type="MarginContainer" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -98,63 +110,65 @@ theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 2
 theme_override_constants/margin_bottom = 2
 
-[node name="CharacterInfo" type="HBoxContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer"]
+[node name="CharacterInfo" type="HBoxContainer" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot/MC"]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 60
 
-[node name="CharIcon" type="TextureRect" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo"]
-custom_minimum_size = Vector2(64, 64)
+[node name="CharIcon" type="TextureRect" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot/MC/CharacterInfo"]
+texture_filter = 3
+material = SubResource("ShaderMaterial_158mb")
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 size_flags_horizontal = 4
-size_flags_vertical = 4
+size_flags_vertical = 8
 texture = ExtResource("1_unlas")
 expand_mode = 1
 stretch_mode = 4
 
-[node name="Name" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo"]
+[node name="Name" type="Label" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot/MC/CharacterInfo"]
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
+size_flags_horizontal = 4
 text = "Othenson
 "
+label_settings = SubResource("LabelSettings_cayip")
+vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo"]
+[node name="HealthCont" type="VBoxContainer" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot/MC/CharacterInfo"]
 layout_mode = 2
 
-[node name="Label4" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer"]
+[node name="Label4" type="Label" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot/MC/CharacterInfo/HealthCont"]
 layout_mode = 2
 text = "Health : "
 label_settings = SubResource("LabelSettings_vtf3y")
 horizontal_alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer"]
+[node name="HealthVals" type="VBoxContainer" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot/MC/CharacterInfo/HealthCont"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
 theme_override_constants/separation = 0
+alignment = 1
 
-[node name="Label2" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer/VBoxContainer"]
+[node name="Phys" type="Label" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot/MC/CharacterInfo/HealthCont/HealthVals"]
 layout_mode = 2
 text = "Physical - 100/100"
 
-[node name="Label3" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer/VBoxContainer"]
+[node name="Ment" type="Label" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot/MC/CharacterInfo/HealthCont/HealthVals"]
 layout_mode = 2
 text = "Mental - 100/100"
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo"]
+[node name="StatusCont" type="VBoxContainer" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot/MC/CharacterInfo"]
 layout_mode = 2
 
-[node name="Label4" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer2"]
+[node name="Label4" type="Label" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot/MC/CharacterInfo/StatusCont"]
 layout_mode = 2
 text = "Status effects : "
 label_settings = SubResource("LabelSettings_vtf3y")
 horizontal_alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer2"]
+[node name="StatusEffects" type="VBoxContainer" parent="MarginContainer/MarginContainer/ProfilesContainer/CharacterSlot/MC/CharacterInfo/StatusCont"]
 layout_mode = 2
 theme_override_constants/separation = 0
-
-[node name="Label2" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer2/VBoxContainer"]
-layout_mode = 2
-text = "Physical - "
-
-[node name="Label3" type="Label" parent="MarginContainer/MarginContainer/VBoxContainer/CharacterSlot/MarginContainer/CharacterInfo/VBoxContainer2/VBoxContainer"]
-layout_mode = 2
-text = "Mental - "

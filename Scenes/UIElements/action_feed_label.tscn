@@ -3,11 +3,11 @@
 [ext_resource type="Script" uid="uid://wfeb4frahuso" path="res://Script/UIElements/action_feed_label.gd" id="1_16hjm"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_wfhf3"]
+font_size = 20
 outline_size = 6
 outline_color = Color(0, 0, 0, 1)
 
 [node name="ActionFeedLabel" type="Label"]
-modulate = Color(1, 1, 1, 0.866667)
 size_flags_vertical = 8
 text = "abba"
 label_settings = SubResource("LabelSettings_wfhf3")

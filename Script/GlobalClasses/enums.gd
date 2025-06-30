@@ -1,3 +1,3 @@
 extends Node
 
-enum TSkill{Damage,ApStatus}
+enum TSkill{Damage,ApplyStatus}

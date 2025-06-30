@@ -1,9 +1,10 @@
-[gd_scene load_steps=14 format=3 uid="uid://bfmxkonlnbgpe"]
+[gd_scene load_steps=15 format=3 uid="uid://bfmxkonlnbgpe"]
 
 [ext_resource type="Script" uid="uid://d0lg86i44nlqy" path="res://Script/fight_scene.gd" id="1_43a11"]
 [ext_resource type="Texture2D" uid="uid://dbbp3lwlsb60m" path="res://Assets/Textures/Images/plains.png" id="2_1a0q2"]
 [ext_resource type="Script" uid="uid://bfma5jes48a7e" path="res://Script/UIElements/action_feed.gd" id="4_78axv"]
 [ext_resource type="Script" uid="uid://7avv4jlxpcq6" path="res://Script/UIElements/damage_nums.gd" id="6_1a0q2"]
+[ext_resource type="AudioStream" uid="uid://f4sec1j6lbfv" path="res://Assets/Sound/battle_plainsif BattleEnemies.size() == 0 BattleEnd(1) return.ogg" id="6_j70gj"]
 [ext_resource type="PackedScene" uid="uid://bp77o3susnype" path="res://Scenes/UIElements/cursor.tscn" id="7_fwfnk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uxmv6"]
@@ -538,6 +539,14 @@ one_shot = true
 [node name="LabelAnim" type="Timer" parent="Timers"]
 wait_time = 0.7
 one_shot = true
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="Music" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("6_j70gj")
+volume_db = -8.0
+autoplay = true
+parameters/looping = true
 
 [node name="AttackTexture" type="TextureRect" parent="."]
 layout_mode = 1

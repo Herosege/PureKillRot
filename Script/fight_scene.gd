@@ -16,6 +16,7 @@ const ITEMS_PER_PAGE = 8
 @onready var OverlayColor = get_node("Overlay/ColorRect")
 @onready var EnNameDis = get_node("UI/EnemyNameDisplay")
 @onready var AttTexture = get_node("AttackTexture")
+@onready var Audio = get_node("Audio")
 
 @onready var ItemScene = load("res://Scenes/UIElements/item.tscn") 
 
@@ -414,13 +415,13 @@ func CommitActions():
 			SkillUse(SkillT,TargetArray,TargetType,EnemyType,AttackedName)
 			DamagedFlashAnim(EnemNode)
 			
-			SkillUseTimer.start(0.6)
+			SkillUseTimer.start(0.85)
 			await SkillUseTimer.timeout
 			
 			CheckDeadUpdate(TargetArray,TargetType,EnemyType,CharaType,AttackedName)
 			if CheckEndFight():
 				return
-			SkillUseTimer.start(0.05)
+			SkillUseTimer.start(0.55)
 			await SkillUseTimer.timeout
 	ResetMenu()
 	if FightParty:
@@ -524,6 +525,7 @@ func CharacterDie(Index,Type):
 
 #0-lose   1-win
 func BattleEnd(type):
+	Audio.get_node("Music").stop()
 	if type == 0:
 		HaltAction = true
 		TextToSet = "You lost"

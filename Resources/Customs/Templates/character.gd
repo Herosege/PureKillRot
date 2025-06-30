@@ -8,44 +8,42 @@ var Icon : CompressedTexture2D
 
 var Dead = false
 
-var MaxPhysicalHealth : float = 100.0
-var MaxMentalHealth : float = 100.0
+var MaxPhysicalHealth : int = 100
+var MaxMentalHealth : int = 100
 
-var PhysicalStrength : float = 10.0
-var MentalStrength : float = 10.0
-var Defence : float = 1.0
+var PhysicalStrength : int = 10
+var MentalStrength : int = 10
+var Defence : int = 1
 
 #ActiveStats
 
-var PhysicalHealth : float = MaxPhysicalHealth :
+var PhysicalHealth : int = MaxPhysicalHealth :
 	set(val):
-		PhysicalHealth = clamp(val,0.0,MaxPhysicalHealth)
-var MentalHealth : float = MaxMentalHealth:
+		PhysicalHealth = clamp(val,0,MaxPhysicalHealth)
+var MentalHealth : int = MaxMentalHealth:
 	set(val):
-		MentalHealth = clamp(val,0.0,MaxMentalHealth)
+		MentalHealth = clamp(val,0,MaxMentalHealth)
 
-var StatusEffects : Array[Array] = [[],[]]
+var StatusEffects : Array = [] 
 
 var Skills = []
 var Special = []
 #Methods
 
 #0 for physical 
-#1 for mental
-func AddEffect(Type:int,EffectId:int,Duration:int)->void:
-	var FindEff = StatusEffects[Type].find(EffectId)
+func AddEffect(EffectId:int,Duration:int,Stacks:int)->void:
+	var FindEff = StatusEffects.find(EffectId)
 	
 	if FindEff>=0:
-		if StatusEffects[Type][FindEff] < Duration:
-			StatusEffects[Type][FindEff] #add duration ref
+		if StatusEffects[FindEff] < Duration:
+			StatusEffects[FindEff] #add duration ref
 		return
-	StatusEffects[Type].append(EffectId)
+	StatusEffects.append(EffectId)
 
-func RemoveEffect(Type:int,EffectId:int)->void:
-	var FindEff = StatusEffects[Type].find(EffectId)
+func RemoveEffect(EffectId:int)->void:
+	var FindEff = StatusEffects.find(EffectId)
 	if FindEff>=0:
-		StatusEffects[Type].remove_at(FindEff)
-	return
+		StatusEffects.remove_at(FindEff)
 
 func _init(aa,bb,a,b,c,d,e,Sk = []):
 	Name = aa

@@ -1,6 +1,6 @@
 extends Label
 
-const AFLTime = 5.0
+const AFLTime = 5.9
 
 var t = 0.0
 
