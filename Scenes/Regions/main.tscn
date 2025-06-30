@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=4 uid="uid://cu18b815pdjcd"]
+[gd_scene load_steps=27 format=4 uid="uid://cu18b815pdjcd"]
 
 [ext_resource type="Script" uid="uid://h2d47n5wefa0" path="res://Script/main.gd" id="1_pbodp"]
 [ext_resource type="PackedScene" uid="uid://n7fwdscbrrnq" path="res://Scenes/player.tscn" id="1_pqh3w"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://b5tohn3yn3xbh" path="res://Scenes/Environment/tree.tscn" id="9_t60dk"]
 [ext_resource type="Texture2D" uid="uid://q87jaiul0jc7" path="res://Assets/Textures/Tilemaps/Grass/tilemapgrass_frames_2_0.png" id="10_0re03"]
 [ext_resource type="Texture2D" uid="uid://xp06h01r5xob" path="res://Assets/Textures/Environment/house1.png" id="10_fdnlq"]
+[ext_resource type="Texture2D" uid="uid://c53r3ykvwwocn" path="res://Assets/Textures/Sprites_normal/Enemies/EnemyShadow.png" id="11_0re03"]
 [ext_resource type="Shader" uid="uid://b05ic1le55bio" path="res://Resources/Shaders/floor1.gdshader" id="11_6iyac"]
 [ext_resource type="Texture2D" uid="uid://dpplgs8b371hq" path="res://Assets/Textures/Sprites_normal/Enemies/NormalWolf_b.png" id="12_0re03"]
 [ext_resource type="Texture2D" uid="uid://cw0k254lt0fy7" path="res://Assets/Textures/Sprites_battle/Enemy/Enemy1.png" id="13_t60dk"]
@@ -436,11 +437,14 @@ z_index = 1
 y_sort_enabled = true
 position = Vector2(-609, 458)
 script = ExtResource("9_kbp3e")
-metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="YSort/Wolf"]
 sprite_frames = SubResource("SpriteFrames_rpcan")
 offset = Vector2(0, -36)
+
+[node name="Sprite2D" type="Sprite2D" parent="YSort/Wolf"]
+position = Vector2(0, -35)
+texture = ExtResource("11_0re03")
 
 [node name="EventNode" parent="YSort/Wolf" instance=ExtResource("2_w6kk3")]
 position = Vector2(0, -40)

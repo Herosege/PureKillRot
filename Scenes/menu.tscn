@@ -1,8 +1,17 @@
-[gd_scene load_steps=8 format=3 uid="uid://e55yhkovq1g7"]
+[gd_scene load_steps=11 format=3 uid="uid://e55yhkovq1g7"]
 
 [ext_resource type="Script" uid="uid://dykt2u38tm08n" path="res://Script/menu.gd" id="1_qd5w8"]
 [ext_resource type="Texture2D" uid="uid://bls8cn6je3t52" path="res://Assets/Textures/Sprites_battle/Icons/Othenson.png" id="1_unlas"]
 [ext_resource type="Shader" uid="uid://bxaygjvv1hcr1" path="res://Resources/Shaders/char_profile_border.gdshader" id="2_cayip"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_158mb"]
+font_size = 32
+
+[sub_resource type="LabelSettings" id="LabelSettings_wwsa2"]
+font_size = 32
+
+[sub_resource type="LabelSettings" id="LabelSettings_jsrd8"]
+font_size = 32
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alioa"]
 bg_color = Color(0, 0, 0, 0.470588)
@@ -60,21 +69,24 @@ theme_override_constants/margin_bottom = 10
 
 [node name="Select" type="MarginContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_constants/margin_right = 800
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 750
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Select"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 50
 
 [node name="Label" type="Label" parent="MarginContainer/Select/VBoxContainer"]
 layout_mode = 2
 text = "Items"
+label_settings = SubResource("LabelSettings_158mb")
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Label2" type="Label" parent="MarginContainer/Select/VBoxContainer"]
 layout_mode = 2
 text = "Party"
+label_settings = SubResource("LabelSettings_wwsa2")
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -82,6 +94,7 @@ vertical_alignment = 1
 layout_mode = 2
 text = "Map
 "
+label_settings = SubResource("LabelSettings_jsrd8")
 horizontal_alignment = 1
 vertical_alignment = 1
 

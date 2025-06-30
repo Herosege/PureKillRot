@@ -1,8 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://b461j4ney5bsb"]
+[gd_scene load_steps=13 format=3 uid="uid://b461j4ney5bsb"]
 
 [ext_resource type="Script" uid="uid://b73s70xssf4a6" path="res://Script/UIElements/char_profile.gd" id="1_44v3o"]
 [ext_resource type="Texture2D" uid="uid://bls8cn6je3t52" path="res://Assets/Textures/Sprites_battle/Icons/Othenson.png" id="1_deygv"]
 [ext_resource type="Shader" uid="uid://bxaygjvv1hcr1" path="res://Resources/Shaders/char_profile_border.gdshader" id="2_alxar"]
+[ext_resource type="Texture2D" uid="uid://dtxf0ucv0as68" path="res://Assets/Textures/UIIcons/Battle/Phys.png" id="4_ptu7r"]
+[ext_resource type="Texture2D" uid="uid://cx1gb1ekd0kor" path="res://Assets/Textures/UIIcons/Battle/Ment.png" id="5_m1x8n"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hovjx"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -21,7 +23,11 @@ shader_parameter/FlashOn = false
 shader_parameter/FlashAmnt = 0.0
 
 [sub_resource type="LabelSettings" id="LabelSettings_8kfvr"]
-font_size = 18
+
+[sub_resource type="LabelSettings" id="LabelSettings_ptu7r"]
+font_size = 12
+outline_size = 6
+outline_color = Color(0, 0, 0, 0.435294)
 
 [sub_resource type="Animation" id="Animation_ptu7r"]
 length = 0.001
@@ -98,6 +104,15 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_hovjx")
 
+[node name="Label3" type="Label" parent="."]
+layout_mode = 2
+offset_left = 110.0
+offset_top = 38.0
+offset_right = 111.0
+offset_bottom = 61.0
+grow_horizontal = 0
+grow_vertical = 2
+
 [node name="StatsPicture" type="HBoxContainer" parent="."]
 layout_mode = 0
 offset_right = 40.0
@@ -125,11 +140,37 @@ label_settings = SubResource("LabelSettings_8kfvr")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Label" type="Label" parent="StatsPicture/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="StatsPicture/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="StatsPicture/VBoxContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="StatsPicture/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="StatsPicture/VBoxContainer/HBoxContainer/VBoxContainer2"]
+show_behind_parent = true
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture = ExtResource("4_ptu7r")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="StatsPicture/VBoxContainer/HBoxContainer/VBoxContainer2"]
+show_behind_parent = true
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture = ExtResource("5_m1x8n")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="StatsPicture/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="StatsPicture/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "100000"
+label_settings = SubResource("LabelSettings_ptu7r")
+
+[node name="Label2" type="Label" parent="StatsPicture/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "100000"
+label_settings = SubResource("LabelSettings_ptu7r")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

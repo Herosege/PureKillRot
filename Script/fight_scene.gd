@@ -115,7 +115,7 @@ func GenProfiles():
 		var CChar = PartyInfo.MainParty[i]
 		CharPInst.SetImage(CChar.Icon)
 		CharPInst.SetName(CChar.Name)
-		CharPInst.SetHealth(CChar.PhysicalHealth,CChar.MentalHealth)
+		CharPInst.SetHealth(CChar.PhysicalHealth,CChar.MentalHealth,CChar.MaxPhysicalHealth,CChar.MaxMentalHealth)
 		CharProfs.add_child(CharPInst)
 
 func BattleStart(Enemies : Array,Msg : String)->void:
@@ -228,7 +228,7 @@ func UpdateProfiles():
 	for i in CharProfs.get_children().size():
 		var CCharP = CharProfs.get_child(i)
 		CCharP.SelectCurrent(i==CharacterTurn)
-		CCharP.SetHealth(PartyInfo.MainParty[i].PhysicalHealth,PartyInfo.MainParty[i].MentalHealth)
+		CCharP.SetHealth(PartyInfo.MainParty[i].PhysicalHealth,PartyInfo.MainParty[i].MentalHealth,PartyInfo.MainParty[i].MaxPhysicalHealth,PartyInfo.MainParty[i].MaxMentalHealth)
 		if PartyInfo.MainParty[i].Dead == true:
 			CCharP.SetDead(true)
 

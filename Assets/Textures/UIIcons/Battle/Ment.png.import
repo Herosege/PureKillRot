@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d0ojusjr3qa0p"
-path="res://.godot/imported/Amy_bw.png-e7adab7f2895a1c91a48e37a2b3696e0.ctex"
+uid="uid://cx1gb1ekd0kor"
+path="res://.godot/imported/Ment.png-c2a104a20fc46c552afa238219b7ff64.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/Sprites_battle/Icons/Amy_bw.png"
-dest_files=["res://.godot/imported/Amy_bw.png-e7adab7f2895a1c91a48e37a2b3696e0.ctex"]
+source_file="res://Assets/Textures/UIIcons/Battle/Ment.png"
+dest_files=["res://.godot/imported/Ment.png-c2a104a20fc46c552afa238219b7ff64.ctex"]
 
 [params]
 
