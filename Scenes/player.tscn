@@ -1,8 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://n7fwdscbrrnq"]
+[gd_scene load_steps=12 format=3 uid="uid://n7fwdscbrrnq"]
 
 [ext_resource type="Script" uid="uid://dd02fg18e1hpv" path="res://Script/player.gd" id="1_7uqau"]
 [ext_resource type="Texture2D" uid="uid://c2kvgv6kr1yxh" path="res://Assets/Textures/Sprites_normal/Characters/me1_d.png" id="2_cvnsp"]
+[ext_resource type="Texture2D" uid="uid://dpdcb2innagpq" path="res://Assets/Textures/Sprites_normal/Characters/me1_l.png" id="3_8erm5"]
 [ext_resource type="Texture2D" uid="uid://cfeeijw4jiodp" path="res://Assets/Textures/Sprites_normal/Characters/walk1_d.png" id="3_vgqql"]
+[ext_resource type="Texture2D" uid="uid://dva4kvex6nju6" path="res://Assets/Textures/Sprites_normal/Characters/me1_r.png" id="4_f1ek2"]
 [ext_resource type="Texture2D" uid="uid://bxsdbj6bfixnx" path="res://Assets/Textures/Sprites_normal/Characters/walk2_d.png" id="4_fkybt"]
 [ext_resource type="Texture2D" uid="uid://b2ox7jrivfkqi" path="res://Assets/Textures/Sprites_normal/Characters/me1_u.png" id="5_3smsa"]
 [ext_resource type="Texture2D" uid="uid://bp7cud6vxaerp" path="res://Assets/Textures/Sprites_normal/Characters/walk1_u.png" id="6_8erm5"]
@@ -20,6 +22,22 @@ animations = [{
 "loop": true,
 "name": &"def_d",
 "speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_8erm5")
+}],
+"loop": true,
+"name": &"def_l",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_f1ek2")
+}],
+"loop": true,
+"name": &"def_r",
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -48,6 +66,22 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": ExtResource("3_8erm5")
+}],
+"loop": true,
+"name": &"walk_left",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_f1ek2")
+}],
+"loop": true,
+"name": &"walk_right",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": ExtResource("5_3smsa")
 }, {
 "duration": 1.0,
@@ -61,7 +95,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"walk_up",
-"speed": 5.0
+"speed": 6.0
 }]
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
@@ -78,7 +112,7 @@ shape = SubResource("RectangleShape2D_2k4lj")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(4, 16)
 sprite_frames = SubResource("SpriteFrames_okuqu")
-animation = &"def_u"
+animation = &"def_d"
 autoplay = "def_d"
 offset = Vector2(0, -32)
 metadata/_edit_lock_ = true

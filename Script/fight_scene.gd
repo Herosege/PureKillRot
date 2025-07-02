@@ -421,7 +421,7 @@ func CommitActions():
 			CheckDeadUpdate(TargetArray,TargetType,EnemyType,CharaType,AttackedName)
 			if CheckEndFight():
 				return
-			SkillUseTimer.start(0.55)
+			SkillUseTimer.start(0.25)
 			await SkillUseTimer.timeout
 	ResetMenu()
 	if FightParty:

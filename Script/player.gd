@@ -27,12 +27,20 @@ func _process(delta):
 			Sprite.play("walk_down")
 		if Dir.y < 0 and Sprite.animation != "walk_up":
 			Sprite.play("walk_up")
+		if Dir.x > 0 and Sprite.animation != "walk_right":
+			Sprite.play("walk_right")
+		if Dir.x < 0 and Sprite.animation != "walk_left":
+			Sprite.play("walk_left")
 		velocity += Dir.normalized() * Speed * delta * 15
 	else:
 		if Sprite.animation == "walk_down":
 			Sprite.play("def_d")
 		if Sprite.animation == "walk_up":
 			Sprite.play("def_u")
+		if Sprite.animation == "walk_right":
+			Sprite.play("def_r")
+		if Sprite.animation == "walk_left":
+			Sprite.play("def_l")
 	if Input.is_action_pressed("Sprint"):
 		MaxSpeed = 320
 	else:
