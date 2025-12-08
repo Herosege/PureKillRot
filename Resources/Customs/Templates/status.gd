@@ -8,7 +8,12 @@ var Effect
 
 #in turns
 var Duration : int
-var Stacks 
+var Stacks : int
 
 func ActivateEffect():
 	Effect.call()
+
+func _init(a,b,c):
+	Name = a
+	Icon = b
+	Effect = c

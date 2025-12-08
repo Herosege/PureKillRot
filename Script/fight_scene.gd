@@ -102,7 +102,8 @@ func _process(delta):
 		ExitBattleScene(AwaitInptToEnd)
 	if OverlayColor.color.a>0.0:
 		OverlayColor.color.a = lerp(OverlayColor.color.a,0.0,1.5*delta)
-	TextBoxHandle(delta)
+	if !TextToSet.is_empty() and TextboxMode == TBM.std_text:
+		TextBoxHandle(delta)
 	if !HaltAction:
 		UiMovement()
 		UiLayerHandle()
@@ -395,9 +396,7 @@ func CommitActions():
 			var STimes = SkillDB.GetSkill(SkillT[0]).AnimDuration
 			var Sprts = SkillDB.GetSkill(SkillT[0]).AnimSprites
 			
-			
 			var EnemNode
-			
 			
 			if ActionBuffer[i][1] == 1:
 				EnemNode = EnemyList.get_child(TargetType)
@@ -539,26 +538,31 @@ func ExitBattleScene(type):
 	SignalBus.emit_signal("EndBattle",type)
 	queue_free()
 
+### DOWN PANEL HANDLE ---------------------------------------------------------------------------------------
+
+func SetDownPanelMsg(Message):
+	pass
+
+
 ### TEXTBOX ------------------------------------------------------------------------------------------------------
 
 var NewTextSwitch = true
 var PrevTTS = ""
 
 func TextBoxHandle(delta):
-	if !TextToSet.is_empty() and TextboxMode == TBM.std_text:
-		if !PrevTTS.is_empty() and TextToSet != PrevTTS:
-			NewTextSwitch = true
-		PrevTTS = TextToSet
-		if NewTextSwitch:
-			DPMessage.text = ""
-			NewTextSwitch = false
-			Globals.TextTime = 0.0
-			Globals.TextIndex = 0
-			Globals.CharTime = Globals.TEXTSCROLLTIME
-			Globals.LettersAtTime = 0.0
-		var Char = Globals.ScrollText(TextToSet,delta)
-		#print(Char,"abba")
-		DPMessage.text += Char
-		if Globals.CurText.is_empty():
-			TextToSet = ""
-			NewTextSwitch = true
+	if !PrevTTS.is_empty() and TextToSet != PrevTTS:
+		NewTextSwitch = true
+	PrevTTS = TextToSet
+	if NewTextSwitch:
+		DPMessage.text = ""
+		NewTextSwitch = false
+		Globals.TextTime = 0.0
+		Globals.TextIndex = 0
+		Globals.CharTime = Globals.TEXTSCROLLTIME
+		Globals.LettersAtTime = 0.0
+	var Char = Globals.ScrollText(TextToSet,delta)
+	#print(Char,"abba")
+	DPMessage.text += Char
+	if Globals.CurText.is_empty():
+		TextToSet = ""
+		NewTextSwitch = true

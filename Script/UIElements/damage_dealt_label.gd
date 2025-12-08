@@ -10,7 +10,6 @@ var t = 0.0
 func _ready():
 	pass
 
-
 func _process(delta):
 	t+=delta
 	

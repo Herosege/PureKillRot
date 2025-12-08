@@ -13,7 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://c53r3ykvwwocn" path="res://Assets/Textures/Sprites_normal/Enemies/EnemyShadow.png" id="11_0re03"]
 [ext_resource type="Shader" uid="uid://b05ic1le55bio" path="res://Resources/Shaders/floor1.gdshader" id="11_6iyac"]
 [ext_resource type="Texture2D" uid="uid://dpplgs8b371hq" path="res://Assets/Textures/Sprites_normal/Enemies/NormalWolf_b.png" id="12_0re03"]
-[ext_resource type="Texture2D" uid="uid://cw0k254lt0fy7" path="res://Assets/Textures/Sprites_battle/Enemy/Enemy1.png" id="13_t60dk"]
+[ext_resource type="Texture2D" uid="uid://bti4xe50wbw81" path="res://Assets/Textures/Environment/bush2.png" id="14_0re03"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_t60dk"]
 seed = 4
@@ -21,9 +21,9 @@ frequency = 0.0895
 cellular_return_type = 5
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_0re03"]
+noise = SubResource("FastNoiseLite_t60dk")
 seamless = true
 normalize = false
-noise = SubResource("FastNoiseLite_t60dk")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_rpcan"]
 texture = ExtResource("10_0re03")
@@ -476,7 +476,8 @@ metadata/_edit_lock_ = true
 position = Vector2(526, -11)
 
 [node name="Enemy1" type="Sprite2D" parent="abba"]
-texture = ExtResource("13_t60dk")
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("14_0re03")
 
 [node name="EventNode" parent="abba" instance=ExtResource("2_w6kk3")]
 AreaShape = SubResource("RectangleShape2D_0re03")
