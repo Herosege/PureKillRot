@@ -10,8 +10,8 @@ var Effect
 var Duration : int
 var Stacks : int
 
-func ActivateEffect():
-	Effect.call()
+func ActivateEffect(creature):
+	Effect.call(creature)
 
 func _init(a,b,c):
 	Name = a

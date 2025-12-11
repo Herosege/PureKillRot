@@ -5,24 +5,18 @@ var Name : String
 var Description : String
 var Icon : CompressedTexture2D
 
-var Effect : int
-var Values : Array
+var Effect 
 
 var AnimSprites : Array
 var AnimDuration : float
 
-#func UseSkill()->bool:
-	#if Effect:
-		#Effect.call()
-		#return true
-	#else:
-		#return false
+func UseSkill(Caster,Reciever):
+	return Effect.call(Caster,Reciever)
 
-func _init(a,b,c,d,e,f,g = 1.0):
+func _init(a,b,c,d,e,f = 1.0):
 	Name = a
 	Description = b
 	Icon = c
-	Effect = d
-	Values = e
-	AnimSprites = f
-	AnimDuration = g
+	AnimSprites = d
+	Effect = e
+	AnimDuration = f

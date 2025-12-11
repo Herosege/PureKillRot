@@ -411,7 +411,7 @@ func CommitActions():
 			AttackTextureAnim(Sprts,STimes,EnemNode.global_position+EnemNode.size/2)
 			
 			await SkillUseTimer.timeout
-			SkillUse(SkillT,TargetArray,TargetType,EnemyType,AttackedName)
+			SkillUse(SkillT,TargetArray,TargetType,EnemyType,AttackerType,AttackedName)
 			DamagedFlashAnim(EnemNode)
 			
 			SkillUseTimer.start(0.85)
@@ -441,21 +441,28 @@ func GenEnemyActions():
 		TempBuf[2] = FightParty[TempBuf[2]]
 		ActionBuffer.append(TempBuf)
 
-func SkillUse(SkillT,TargetArray,TargetType,EnemyType,AttackedName):
+func SkillUse(SkillT,TargetArray,TargetType,EnemyType,AttackerType,AttackedName):
 	var Effect = SkillDB.GetSkill(SkillT[0]).Effect
-	var Vals = SkillDB.GetSkill(SkillT[0]).Values
+	#var Vals = SkillDB.GetSkill(SkillT[0]).Values
 	
-	match Effect:
-		Enums.TSkill.Damage:
-			CheckEndFight()
-			if SkillT[1] == IsAttacked.character:
-				if EnemyType.Dead == true:
-					TargetType = FightParty[randi()%FightParty.size()]
-					EnemyType = TargetArray[TargetType]
-			EnemyType.TakeDamage(Vals[0])
-			SignalBus.emit_signal("AnnounceAction", AttackedName + " took " + str(Vals[0]) + " Damage!")
-			UpdateProfiles()
-			DamageNumberAnim(Vals[0])
+	#match Effect:
+		#Enums.TSkill.Damage:
+	CheckEndFight()
+	if SkillT[1] == IsAttacked.character:
+		if EnemyType.Dead == true:
+			TargetType = FightParty[randi()%FightParty.size()]
+			EnemyType = TargetArray[TargetType]
+	#Vals[0] - enums, value type   Vals[1] - values corresponding to the type
+	var Vals = SkillDB.GetSkill(SkillT[0]).UseSkill(AttackerType,EnemyType)
+	for i in Vals[0].size():
+		if Vals[0][i] == Enums.TSkill.Damage:
+			SignalBus.emit_signal("AnnounceAction", AttackedName + " took " + str(Vals[1][i]) + " Damage!")
+			DamageNumberAnim(Vals[1][i])
+		if Vals[0][i] == Enums.TSkill.ApplyStatus:
+			SignalBus.emit_signal("AnnounceAction", "Status effect applied")
+	#EnemyType.TakeDamage(Vals[0])
+	#SignalBus.emit_signal("AnnounceAction", AttackedName + " took " + str(Vals[0]) + " Damage!")
+	UpdateProfiles()
 
 func CheckEndFight()->bool:
 	if BattleEnemies.size() == 0:
@@ -539,9 +546,6 @@ func ExitBattleScene(type):
 	queue_free()
 
 ### DOWN PANEL HANDLE ---------------------------------------------------------------------------------------
-
-func SetDownPanelMsg(Message):
-	pass
 
 
 ### TEXTBOX ------------------------------------------------------------------------------------------------------

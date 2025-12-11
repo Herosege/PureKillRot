@@ -8,20 +8,20 @@ func GetStatusEff(ID:int)->StatusEff:
 var Err = StatusEff.new(
 	"wormy",
 	load("res://Assets/Textures/Environment/bush2.png"),
-	func ():
+	func (creature):
 		pass
 )
 
 var Bleeding = StatusEff.new(
-	"wormy",
+	"bleeding",
 	load("res://Assets/Textures/Environment/bush2.png"),
-	func ():
+	func (creature):
 		pass
 )
 
 var Tired = StatusEff.new(
-	"wormy",
+	"tired",
 	load("res://Assets/Textures/Environment/bush2.png"),
-	func ():
+	func (creature):
 		pass
 )
