@@ -2,6 +2,11 @@ extends Node
 
 @onready var ArrayChar = [Char_Me,Char_Amy,Char_Witold]
 
+func _ready():
+	for i in ArrayChar:
+		i.ID = ArrayChar.find(i)
+	pass
+
 func GetChar(ID:int)->Character:
 	return ArrayChar[ID]
 
@@ -34,7 +39,7 @@ var Char_Me = Character.new(
 	load(IconsF + "Me.png"),
 	120.0,70.0,
 	10.0,10.0,
-	1.0,[0,1,2]
+	1.0,[0,1,2,3]
 	)
 
 var Char_Amy = Character.new(
@@ -42,7 +47,7 @@ var Char_Amy = Character.new(
 	load(IconsF + "Amy.png"),
 	123.0,111.0,
 	10.0,10.0,
-	1.0,[1]
+	1.0,[1,3]
 )
 
 var Char_Witold = Character.new(

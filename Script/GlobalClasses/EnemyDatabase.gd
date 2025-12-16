@@ -2,6 +2,11 @@ extends Node
 
 @onready var EnemyArr = [Wolf]
 
+func _ready():
+	for i in EnemyArr:
+		i.ID = EnemyArr.find(i)
+	pass
+
 func GetEnemy(ID:int)->Enemy:
 	return EnemyArr[ID]
 

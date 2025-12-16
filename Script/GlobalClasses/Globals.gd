@@ -14,6 +14,7 @@ var LettersAtTime = 0.0
 
 var CurText = ""
 
+
 func ScrollText(Text,delta)->String:
 	var ValToRet = ""
 	if CurText.is_empty():
@@ -33,4 +34,5 @@ func ScrollText(Text,delta)->String:
 			TextIndex += LettersAtTime
 			if TextIndex >= CurText.length():
 				CurText = ""
+				
 	return ValToRet

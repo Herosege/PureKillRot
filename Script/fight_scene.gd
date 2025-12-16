@@ -43,6 +43,7 @@ var MenuTypes = [
 
 var FightParty = []
 var CharacterTurn : int = -1
+var CharaTurnInOrder : int = 0
 var YourTurn = true
 
 #SelectAction
@@ -64,9 +65,10 @@ var StartMessage : String
 var BattleText = ""
 var BattleEnemies = []
 
-#ActionBuffer - [ID,type,target] - type (who to attack)  0:character 1:enemy
+#ActionBuffer - [ID,type,target,Attacker] - type (who to attack)  0:character 1:enemy
 enum IsAttacked {character,enemy} 
 var ActionBuffer : Array
+var EnActionBuffer : Array
 
 #DownTextbox
 enum TBM {std_text,char_info}
@@ -81,14 +83,16 @@ func _enter_tree():
 	$Overlay.visible = true
 
 func _ready():
-	#Engine.time_scale = 2.0
+	Engine.time_scale = 2.0
 	for i in PartyInfo.MainParty.size():
 		if PartyInfo.MainParty[i].Dead == false:
-			FightParty.append(PartyInfo.MainParty.find(PartyInfo.MainParty[i]))
+			FightParty.append(PartyInfo.MainParty[i])
 			if CharacterTurn == -1:
 				CharacterTurn = i
 	for i in PartyInfo.MainParty.size():
 		ActionBuffer.append(-1)
+	for i in BattleEnemies.size():
+		EnActionBuffer.append(-1)
 	#don't touch this or everything breaks :)
 	await get_tree().create_timer(0.05).timeout
 	#
@@ -164,9 +168,10 @@ func UiLayerHandle()->void:
 			AnimateCursor(true,MenuLayer)
 		if MenuTypes[SelIndexAction].size() == MenuLayer:
 			if !(SelIndexAction == SELECT_PROFILE):
-				ActionBuffer[CharacterTurn] = [TempItemList[SelIndexItem],1,SelIndexEnemy]
+				ActionBuffer[CharaTurnInOrder] = [TempItemList[SelIndexItem],1,SelIndexEnemy,CharacterTurn]
 				
 				CharacterTurn += 1
+				CharaTurnInOrder += 1
 				while PartyInfo.MainParty[min(CharacterTurn,PartyInfo.MainParty.size()-1)].Dead == true and !PartyInfo.MainParty.size() <= CharacterTurn:
 					CharacterTurn += 1
 				ResetMenu()
@@ -190,20 +195,22 @@ func UiLayerHandle()->void:
 			if GoBackAmnt == 0 and PartyInfo.MainParty[GoBackAmnt].Dead == true:
 				return
 			CharacterTurn = GoBackAmnt
+			CharaTurnInOrder -= 1
 			#print("Pre:   ",ActionBuffer)
-			ActionBuffer.set(CharacterTurn,-1)
+			ActionBuffer.set(CharaTurnInOrder,-1)
 			#print("Post:   ",ActionBuffer)
 			UpdateProfiles()
 		if MenuLayer > 0 and Cursor.size() > MenuLayer-1: 
 			AnimateCursor(false,MenuLayer-1)
-		
 		ResetMenuLayer(MenuLayer)
 		
 		MenuLayer -= 1
+		
 		if MenuLayer == 0 and !CharProfs.visible:
 			CharProfs.visible = true
 	UpdateUi(MenuLayer)
 	MenuLayer = clamp(MenuLayer,0,MenuTypes[SelIndexAction].size())
+	SetDPMessage()
 
 func UpdateUi(Layer:int)->void:
 	if Layer == 0:
@@ -275,6 +282,9 @@ func ItemsMenuHandle()->void:
 		SelIndexItem += NUM_COLUMNS_ITEMS * UiDir.y
 		SelIndexItem = clamp(SelIndexItem,0,TempItemList.size()-1)
 	UpdateItems()
+	
+	SetDPMessage()
+	
 	await get_tree().process_frame
 	UpdateUi(MenuLayer)
 	await get_tree().process_frame
@@ -368,7 +378,7 @@ func ResetCursor(Layer):
 func CommitActions():
 	HaltAction = true
 	GenEnemyActions()
-	
+	ActionBuffer.append_array(EnActionBuffer)
 	for i in ActionBuffer.size():
 		if i >= ActionBuffer.size():
 			break
@@ -378,17 +388,17 @@ func CommitActions():
 			var SkillT = ActionBuffer[i]
 			var CharaType = SkillT[1]
 			
-			var AttackerArray = BattleEnemies if CharaType == IsAttacked.character else PartyInfo.MainParty
-			var TargetArray = BattleEnemies if CharaType == IsAttacked.enemy else PartyInfo.MainParty
+			var AttackerArray = BattleEnemies if CharaType == IsAttacked.character else FightParty
+			var TargetArray = BattleEnemies if CharaType == IsAttacked.enemy else FightParty
 			
-			var AttackerIndex = i if CharaType == IsAttacked.enemy else i-PartyInfo.MainParty.size()
+			var AttackerIndex = i if CharaType == IsAttacked.enemy else SkillT[3]
 			var TargetType = SkillT[2] if SkillT[2] <= TargetArray.size()-1 else 0 
 			
 			var AttackerType = AttackerArray[AttackerIndex]
 			var EnemyType = TargetArray[TargetType]
 			
 			var Dupes = CheckDupes(AttackerArray)
-			var AttackerName = AttackerType.Name if !Dupes else str(AttackerType.Name) + " " + str(Dupes)
+			var AttackerName = AttackerType.Name if !Dupes else str(AttackerType.Name) + " " + str(Dupes+AttackerIndex)
 			
 			Dupes = CheckDupes(TargetArray)
 			var AttackedName = EnemyType.Name if !Dupes else str(EnemyType.Name) + " " + str(Dupes+TargetType)
@@ -398,11 +408,17 @@ func CommitActions():
 			
 			var EnemNode
 			
+			if SkillT[1] == IsAttacked.character:
+				if EnemyType.Dead == true:
+					var RandTarget = randi()%FightParty.size()
+					TargetType = RandTarget
+					EnemyType = FightParty[RandTarget]
+			
 			if ActionBuffer[i][1] == 1:
 				EnemNode = EnemyList.get_child(TargetType)
-				CharProfs.get_child(AttackerIndex).PlayFlashAnim()
+				CharProfs.get_child(SkillT[3]).PlayFlashAnim()
 			else:
-				EnemNode = CharProfs.get_child(TargetType).get_node("StatsPicture/TextureRect")
+				EnemNode = CharProfs.get_child(PartyInfo.MainParty.find(FightParty[TargetType])).get_node("StatsPicture/TextureRect")
 				EnemyList.get_child(AttackerIndex).PlayFlashAnim()
 				
 			SignalBus.emit_signal("AnnounceAction",AttackerName + " attacks " + AttackedName)
@@ -411,6 +427,7 @@ func CommitActions():
 			AttackTextureAnim(Sprts,STimes,EnemNode.global_position+EnemNode.size/2)
 			
 			await SkillUseTimer.timeout
+			
 			SkillUse(SkillT,TargetArray,TargetType,EnemyType,AttackerType,AttackedName)
 			DamagedFlashAnim(EnemNode)
 			
@@ -424,34 +441,31 @@ func CommitActions():
 			await SkillUseTimer.timeout
 	ResetMenu()
 	if FightParty:
-		CharacterTurn = FightParty[0]
+		for i in PartyInfo.MainParty.size():
+			if not PartyInfo.MainParty[i].Dead: 
+				CharacterTurn = i
+				break
+	CharaTurnInOrder = 0
 	UpdateProfiles()
-	ActionBuffer.resize(PartyInfo.MainParty.size())
-	for i in ActionBuffer.size():
-		ActionBuffer[i] = -1
+	ActionBuffer.resize(0)
+	for i in FightParty.size():
+		ActionBuffer.append(-1)
 	HaltAction = false if !AwaitInptToEnd else true
 
 func GenEnemyActions():
-	FightParty.resize(0)
-	for i in PartyInfo.MainParty.size():
-		if PartyInfo.MainParty[i].Dead == false:
-			FightParty.append(PartyInfo.MainParty.find(PartyInfo.MainParty[i]))
 	for i in BattleEnemies.size():
 		var TempBuf = BattleEnemies[i].RSkill(Turn,FightParty.size())
-		TempBuf[2] = FightParty[TempBuf[2]]
-		ActionBuffer.append(TempBuf)
+		TempBuf.append(i)
+		EnActionBuffer.append(TempBuf)
 
 func SkillUse(SkillT,TargetArray,TargetType,EnemyType,AttackerType,AttackedName):
-	var Effect = SkillDB.GetSkill(SkillT[0]).Effect
+	#var Effect = SkillDB.GetSkill(SkillT[0]).Effect
 	#var Vals = SkillDB.GetSkill(SkillT[0]).Values
 	
 	#match Effect:
 		#Enums.TSkill.Damage:
 	CheckEndFight()
-	if SkillT[1] == IsAttacked.character:
-		if EnemyType.Dead == true:
-			TargetType = FightParty[randi()%FightParty.size()]
-			EnemyType = TargetArray[TargetType]
+	
 	#Vals[0] - enums, value type   Vals[1] - values corresponding to the type
 	var Vals = SkillDB.GetSkill(SkillT[0]).UseSkill(AttackerType,EnemyType)
 	for i in Vals[0].size():
@@ -518,12 +532,13 @@ func DamageNumberAnim(DamageNum):
 func CharacterDie(Index,Type):
 	match Type:
 		IsAttacked.character:
-			FightParty.remove_at(FightParty.find(Index))
-			PartyInfo.MainParty[Index].Dead = true
+			var Target = FightParty[Index]
+			FightParty[Index].Dead = true
+			FightParty.remove_at(Index)
 			CharProfs.get_child(Index).SetDead(true)
 		IsAttacked.enemy:
-			if ActionBuffer.size() >= PartyInfo.MainParty.size() + BattleEnemies.size():
-				ActionBuffer.remove_at(PartyInfo.MainParty.size()+Index)
+			if ActionBuffer.size() >= FightParty.size() + BattleEnemies.size():
+				ActionBuffer.remove_at(FightParty.size()+Index)
 			BattleEnemies.remove_at(Index)
 			EnemyList.get_child(Index).queue_free()
 			SelIndexEnemy = 0
@@ -547,11 +562,27 @@ func ExitBattleScene(type):
 
 ### DOWN PANEL HANDLE ---------------------------------------------------------------------------------------
 
+func SetDPMessage():
+	if MenuLayer == 0:
+		DPMessage.text = ""
+		return
+	var Layer = MenuTypes[SelIndexAction][MenuLayer-1]
+	match Layer:
+		SELECT_ITEM:
+			DPMessage.text = SkillDB.GetSkill(TempItemList[SelIndexItem]).Description
+		SELECT_CHARACTER:
+			var Typeofenemy = BattleEnemies[SelIndexEnemy]
+			var Statuses = ""
+			for i in Typeofenemy.StatusEffects:
+				var Tex = "[img]{0}[/img]".format([i.Icon])
+				Statuses += "{0}:{1}x{2}  tl: {2} ".format([Tex,i.Duration,i.Stacks])
+			DPMessage.text = "{0}   Hp:{1}/{2}   Status effects: {3}".format([Typeofenemy.Name,Typeofenemy.PhysicalHealth,Typeofenemy.MaxPhysicalHealth,Statuses])
 
 ### TEXTBOX ------------------------------------------------------------------------------------------------------
 
 var NewTextSwitch = true
 var PrevTTS = ""
+
 
 func TextBoxHandle(delta):
 	if !PrevTTS.is_empty() and TextToSet != PrevTTS:
@@ -560,6 +591,7 @@ func TextBoxHandle(delta):
 	if NewTextSwitch:
 		DPMessage.text = ""
 		NewTextSwitch = false
+		Globals.CurText = ""
 		Globals.TextTime = 0.0
 		Globals.TextIndex = 0
 		Globals.CharTime = Globals.TEXTSCROLLTIME

@@ -1,6 +1,11 @@
 extends Node
 
-@onready var ArraySkills = [Skill_Attack,Skill_Defend,Skill_FastAttack]
+@onready var ArraySkills = [Skill_Attack,Skill_Defend,Skill_FastAttack,Skill_HeavyCut]
+
+func _ready():
+	for i in ArraySkills:
+		i.ID = ArraySkills.find(i)
+	pass
 
 func GetSkill(ID:int)->Skill:
 	return ArraySkills[ID] if ID < ArraySkills.size() else Err
@@ -54,7 +59,7 @@ var Skill_Defend = Skill.new(
 )
 var Skill_FastAttack = Skill.new(
 	"FastAttack",
-	"Induces bleeding",
+	"A fast attack",
 	load("res://Assets/Textures/Environment/bush2.png"),
 	[load("res://Assets/Textures/Sprites_normal/Characters/walk2_d.png")],
 	func(Caster,Reciever):
@@ -62,5 +67,18 @@ var Skill_FastAttack = Skill.new(
 		var DamageScaling = 0.5
 		var Damage = BDamage * (1 + (DamageScaling * BASE_SCALING * Caster.PhysicalStrength)) * (1 - (BASE_SCALING * Reciever.Defence))
 		Reciever.TakeDamage(Damage)
+		return [[Enums.TSkill.Damage],[Damage]]
+)
+var Skill_HeavyCut = Skill.new(
+	"Heavy cut",
+	"Induces bleeding",
+	load("res://Assets/Textures/Environment/bush2.png"),
+	[load("res://Assets/Textures/Sprites_normal/Characters/walk2_d.png")],
+	func(Caster,Reciever):
+		var BDamage := 20.0
+		var DamageScaling = 1.0
+		var Damage = BDamage * (1 + (DamageScaling * BASE_SCALING * Caster.PhysicalStrength)) * (1 - (BASE_SCALING * Reciever.Defence))
+		Reciever.TakeDamage(Damage)
+		Reciever.AddEffect(Enums.Status.Bleeding,5,1)
 		return [[Enums.TSkill.Damage],[Damage]]
 )

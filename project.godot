@@ -28,6 +28,7 @@ PartyInfo="*res://Script/GlobalClasses/PartyInfo.gd"
 Inventory="*res://Script/GlobalClasses/Inventory.gd"
 EventHandler="*res://Script/GlobalClasses/EventHandler.gd"
 EnemyDB="*res://Script/GlobalClasses/EnemyDatabase.gd"
+StatusDB="*res://Script/GlobalClasses/StatusDatabase.gd"
 
 [debug]
 

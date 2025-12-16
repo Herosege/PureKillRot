@@ -1,6 +1,8 @@
 extends Resource
 class_name Skill
 
+var ID : int = -1
+
 var Name : String
 var Description : String
 var Icon : CompressedTexture2D
